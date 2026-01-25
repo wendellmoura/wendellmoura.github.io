@@ -1239,6 +1239,7 @@
     const participationBtn = document.getElementById('participation-btn');
     const tokenModal = document.getElementById('token-modal');
     const participationModal = document.getElementById('participation-modal');
+    const tokenSetupModal = document.getElementById('token-setup-modal');
     const tokenDisplay = document.getElementById('token-display');
     const copyTokenBtn = document.getElementById('copy-token');
     const instructionsBtn = document.getElementById('instructions-btn');
@@ -1328,9 +1329,12 @@
             }
         });
 
+        // VERIFICAÇÃO CORRIGIDA: Mostrar modal de token se não houver token
         if (!userToken) {
+            console.log('Não há token, exibindo modal de configuração');
             tokenSetupModal.style.display = 'flex';
         } else {
+            console.log('Token encontrado, carregando rifas');
             loadRaffles();
         }
         
@@ -1390,9 +1394,9 @@
         // Premium numbers
         addPremiumNumberBtn.addEventListener('click', addPremiumNumber);
         
-        // Fechar modais
+        // Fechar modais - CORREÇÃO: Não fechar o modal de configuração inicial automaticamente
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
+            if (e.target.classList.contains('modal') && e.target.id !== 'token-setup-modal') {
                 e.target.style.display = 'none';
             }
         });
