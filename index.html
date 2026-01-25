@@ -2,2276 +2,2567 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Explorer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema de Rifas Online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --success-color: #4cc9f0;
-            --warning-color: #f72585;
-        }
-        
-        body {
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-        }
-        
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .app-header {
-            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px 25px;
-            position: relative;
-        }
-        
-        .app-header h1 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .app-header p {
-            opacity: 0.9;
-            max-width: 700px;
-            margin: 8px 0 0;
-            font-size: 0.95rem;
-        }
-        
-        .app-header::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
-        }
-        
-        .app-body {
-            padding: 20px;
-        }
-        
-        .file-upload-container {
-            background: var(--light-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 2px dashed #d0d0d0;
-        }
-        
-        .nav-tabs .nav-link {
-            font-weight: 600;
-            color: #555;
-            border: none;
-            border-bottom: 3px solid transparent;
-            padding: 10px 15px;
-            font-size: 0.9rem;
-        }
-        
-        .nav-tabs .nav-link.active {
-            color: var(--primary-color);
-            background: transparent;
-            border-bottom: 3px solid var(--primary-color);
-        }
-        
-        .tab-pane {
-            padding-top: 15px;
-        }
-        
-        .filter-section {
-            background: var(--light-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .filters-row {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            gap: 8px;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .dropdown-checkbox {
-            display: inline-block;
-            position: relative;
-            margin-right: 0;
-            margin-bottom: 5px;
-            min-width: 140px;
-            max-width: 200px;
-            vertical-align: top;
-        }
-        
-        .dropdown-checkbox .dropdown-toggle {
-            cursor: pointer;
-            width: 100%;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            background: white;
-            border: 1px solid #ddd;
-            padding: 7px 10px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .dropdown-checkbox .dropdown-toggle::after {
-            content: "▼";
-            font-size: 5px;
-            margin-left: 5px;
-        }
-        
-        .dropdown-checkbox .dropdown-menu {
-            display: none;
-            position: fixed;
-            min-width: 200px;
-            background: white;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 9999;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        
-        .dropdown-checkbox.show .dropdown-menu {
-            display: block;
-        }
-        
-        .dropdown-checkbox label {
-            display: block;
-            font-weight: normal;
-            margin-bottom: 4px;
-            padding: 4px 6px;
-            border-radius: 3px;
-            transition: background 0.2s;
-            font-size: 0.85rem;
-        }
-        
-        .dropdown-checkbox label:hover {
-            background: #f0f5ff;
-        }
-        
-        .highlight {
-            background-color: #fff3cd !important;
-            font-weight: bold;
-        }
-        
-        .badge-filter {
-            margin-right: 6px;
-            margin-bottom: 6px;
-            padding: 5px 10px;
-            font-weight: normal;
-            border-radius: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.85rem;
-        }
-        
-        .table-container {
-            overflow: auto;
-            max-height: 500px;
-            position: relative;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-        
-        .table-container.frozen-header thead th {
-            position: sticky;
-            top: 0;
-            background: #f8f9fa;
-            z-index: 10;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .table-container.frozen-first-col td:first-child,
-        .table-container.frozen-first-col th:first-child {
-            position: sticky;
-            left: 0;
-            background: #f8f9fa;
-            z-index: 5;
-            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
-        }
-        
-        .table-container.frozen-header.frozen-first-col th:first-child {
-            z-index: 15;
-        }
-        
-        .table-container table {
-            margin-bottom: 0;
-            font-size: 0.9rem;
-        }
-        
-        .table-container table th {
-            white-space: nowrap;
-            background: #f8f9fa;
-            padding: 8px 12px;
-        }
-        
-        .table-container table td {
-            padding: 6px 10px;
-        }
-        
-        .controls-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        
-        .btn-group-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-action {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-        }
-        
-        .frozen-controls {
-            background: #f8f9fa;
-            padding: 8px 12px;
-            border-radius: 5px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-        }
-        
-        .frozen-controls label {
-            margin-bottom: 0;
-            font-weight: 500;
-        }
-        
-        .numeric-filter-card {
-            background: #f0f7ff;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
-        
-        .pivot-table-container {
-            max-height: 400px;
-            overflow: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            margin-top: 15px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-            padding: 12px;
-            text-align: center;
-            border-left: 3px solid var(--accent-color);
-            height: 100%;
-        }
-        
-        .stat-card h5 {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 6px;
-        }
-        
-        .stat-card .value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        
-        .footer-credit {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            color: #777;
-            font-size: 0.85rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-        }
-        
-        .pagination-controls {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .tab-pane-content {
-            padding: 10px 0;
-        }
-        
-        .sortable {
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .sortable:after {
-            content: " ⇅";
-            font-size: 0.7em;
-            color: #888;
-        }
-        
-        .sortable.sorted-asc:after {
-            content: " ↑";
-        }
-        
-        .sortable.sorted-desc:after {
-            content: " ↓";
-        }
-        
-        .stats-accordion .accordion-button {
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-        }
-        
-        .stats-accordion .accordion-body {
-            padding: 1rem;
-        }
-        
-        .stats-table {
-            font-size: 0.85rem;
-        }
-        
-        .stats-table th {
-            background-color: #f8f9fa;
-        }
-        
-        .stats-table tr:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-        }
-        
-        .stats-table .stat-label {
-            font-weight: 600;
-            width: 50%;
-        }
-        
-        .page-jump {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-left: 10px;
-        }
-        
-        .page-jump input {
-            width: 70px;
-            text-align: center;
+            --primary: #2c3e50;
+            --secondary: #7f8c8d;
+            --success: #27ae60;
+            --info: #3498db;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #f8f9fa;
+            --dark: #1a1a1a;
+            --card-bg: #ffffff;
+            --body-bg: #f5f7fa;
+            --border: #e0e7ed;
+            --text: #34495e;
+            --shadow: rgba(0, 0, 0, 0.05);
+            --purchased-color: #27ae60;
+            --available-color: #3498db;
+            --reserved-color: #f39c12;
+            --premium-color: #9b59b6;
+            --pending-color: #f39c12;
+            --cancelled-color: #e74c3c;
         }
 
-        /* Novos estilos para acordeões */
-        .accordion-item .accordion-button {
-            padding: 0.8rem 1.25rem;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
-        .accordion-icon {
-            width: 24px;
-            text-align: center;
-            margin-right: 10px;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text);
+            padding: 12px;
+            min-height: 100vh;
+            line-height: 1.4;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
-        
-        .column-type-badge {
-            font-size: 0.75rem;
-            vertical-align: middle;
-            margin-left: 8px;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
-        
-        .distribution-bar {
-            background-color: #4361ee;
-            margin: 0 1px;
-            position: relative;
-            transition: height 0.3s ease;
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        
-        .distribution-bar:hover {
-            background-color: #3a56e0;
+
+        .header-left h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-left p {
+            color: var(--secondary);
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 8px;
             cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
         }
-        
-        /* Melhorias na apresentação de tipos */
-        .badge-numeric {
-            background-color: #4361ee !important;
-        }
-        .badge-currency {
-            background-color: #4cc9f0 !important;
-        }
-        .badge-date {
-            background-color: #f72585 !important;
-        }
-        .badge-text {
-            background-color: #6c757d !important;
-        }
-        
-        /* Estilos para a aba Sobre */
-        .about-content {
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .about-content h6 {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        
-        .about-content ul {
-            padding-left: 20px;
-        }
-        
-        .about-content li {
-            margin-bottom: 8px;
-        }
-        
-        .security-badge {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
-            font-weight: 500;
-        }
-        
-        .feature-list {
+
+        .raffles-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .feature-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 3px solid var(--accent-color);
-        }
-        
-        .feature-card i {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         @media (max-width: 768px) {
-            .controls-row {
+            .raffles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 8px;
+                font-size: 14px;
+            }
+            
+            .header-left h1 {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .raffles-grid {
+                gap: 12px;
+            }
+            
+            .header {
+                padding: 10px;
+            }
+        }
+
+        .raffle-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: transform 0.2s;
+        }
+
+        .raffle-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .raffle-image {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e0e7ed 100%);
+        }
+
+        .raffle-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            z-index: 2;
+        }
+
+        .status-active { background-color: var(--success); }
+        .status-completed { background-color: var(--info); }
+
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--info) 100%);
+        }
+
+        .card-content {
+            padding: 16px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card-description {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            flex-grow: 1;
+        }
+
+        .raffle-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+
+        .info-label {
+            color: var(--secondary);
+        }
+
+        .info-value {
+            font-weight: 600;
+        }
+
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 16px;
+            max-height: 140px;
+            overflow-y: auto;
+            padding: 8px;
+            background-color: var(--body-bg);
+            border-radius: 6px;
+        }
+
+        .number-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+            border: 2px solid transparent;
+        }
+
+        .number-available {
+            background-color: var(--available-color);
+            color: white;
+            border-color: var(--available-color);
+        }
+
+        .number-purchased {
+            background-color: var(--purchased-color);
+            color: white;
+            border-color: var(--purchased-color);
+            cursor: not-allowed;
+        }
+
+        .number-selected {
+            background-color: var(--warning);
+            color: white;
+            border-color: var(--warning);
+            transform: scale(1.05);
+        }
+
+        .number-premium {
+            background-color: var(--premium-color);
+            color: white;
+            border-color: var(--premium-color);
+        }
+
+        .number-pending {
+            background-color: var(--pending-color);
+            color: white;
+            border-color: var(--pending-color);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .number-cancelled {
+            background-color: var(--cancelled-color);
+            color: white;
+            border-color: var(--cancelled-color);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .selection-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--text);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .qty-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid var(--border);
+            background-color: var(--body-bg);
+            color: var(--text);
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.9rem;
+        }
+
+        .btn-select-random {
+            flex: 1;
+            background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .btn-purchase {
+            background: linear-gradient(135deg, var(--success) 0%, #1e8449 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-purchase:disabled {
+            background: var(--secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .status-bar {
+            padding: 10px 16px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .admin-info {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(243, 156, 18, 0.2);
+            font-weight: 600;
+        }
+
+        .admin-panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .admin-panel h2 {
+            color: var(--primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 1.2rem;
+        }
+
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .admin-form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-form-group label {
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .admin-form-group input,
+        .admin-form-group textarea,
+        .admin-form-group select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--body-bg);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .premium-numbers-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .premium-number-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background-color: var(--premium-color);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+        }
+        
+        .modal-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        
+        .modal-footer {
+            padding: 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .btn-close {
+            background: linear-gradient(135deg, var(--secondary) 0%, #6c7a89 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .purchase-summary {
+            background-color: var(--body-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--success);
+        }
+        
+        .purchase-summary p {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .code-generated {
+            margin-bottom: 16px;
+        }
+        
+        .code-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .code-value {
+            font-family: monospace;
+            background-color: var(--body-bg);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px dashed var(--border);
+            text-align: center;
+            font-size: 1rem;
+            word-break: break-all;
+        }
+        
+        .warning-note {
+            color: var(--danger);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .firebase-status {
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: var(--secondary);
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
+            font-weight: 600;
+            min-width: 250px;
+            max-width: 90%;
+            text-align: center;
+            opacity: 0;
+            animation: slideIn 0.3s forwards, fadeOut 0.3s 2.7s forwards;
+        }
+        
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--info); }
+        
+        @keyframes slideIn {
+            from { bottom: -50px; opacity: 0; }
+            to { bottom: 20px; opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .reservations-panel {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .reservations-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .reservation-item {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background-color: var(--body-bg);
+            font-size: 0.85rem;
+        }
+        
+        .reservation-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .btn-confirm {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .btn-cancel {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .winner-section {
+            background: rgba(39, 174, 96, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 12px;
+        }
+        
+        .winner-details {
+            background: rgba(243, 156, 18, 0.1);
+            border-left: 3px solid var(--warning);
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 12px;
+        }
+
+        .winner-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--warning);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+        }
+
+        .premium-winners {
+            background: rgba(155, 89, 182, 0.1);
+            border-left: 3px solid var(--premium-color);
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 12px;
+        }
+
+        .raffle-admin-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-set-winner {
+            background: var(--premium-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        .btn-auto-draw {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        @media (max-width: 360px) {
+            .raffles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .numbers-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .modal-footer {
                 flex-direction: column;
-                align-items: stretch;
             }
             
-            .btn-group-actions {
+            .modal-footer button {
                 width: 100%;
-                justify-content: center;
             }
             
-            .frozen-controls {
-                flex-wrap: wrap;
+            .selection-controls {
+                flex-direction: column;
             }
             
-            .stats-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
-            
-            .page-jump {
-                margin-left: 0;
-                margin-top: 10px;
+            .btn-select-random {
                 width: 100%;
-                justify-content: center;
             }
         }
     </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <h1><i class="fas fa-table"></i>Data Explorer</h1>
-            <p>Análise e exploração de dados - Importe arquivos CSV ou Excel diretamente no navegador</p>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>Rifas Online</h1>
+                <p>Participe e concorra a prêmios</p>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" id="instructions-btn" title="Instruções">
+                    <i class="fas fa-info"></i>
+                </button>
+                <button class="header-btn" id="token-btn" title="Token">
+                    <i class="fas fa-key"></i>
+                </button>
+                <button class="header-btn" id="admin-toggle" title="Admin">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
         </header>
         
-        <div class="app-body">
-            <div class="file-upload-container">
-                <div class="mb-3">
-                    <label for="fileInput" class="form-label">
-                        <i class="fas fa-file-import me-2"></i> Carregar arquivo (CSV ou Excel)
-                    </label>
-                    <input class="form-control" type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+        <div class="firebase-status" id="firebase-status">
+            Conectando ao sistema...
+        </div>
+        
+        <div class="admin-info" id="admin-info" style="display: none;">
+            <i class="fas fa-user-shield"></i> Modo Administrador Ativo
+        </div>
+        
+        <div class="user-info" id="user-info" style="display: none;">
+            <i class="fas fa-user"></i>
+            <span id="user-name">Usuário</span>
+            <button class="btn-logout" id="btn-logout" style="background:none;border:none;color:inherit;margin-left:auto;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+        
+        <div class="admin-panel" id="admin-panel">
+            <h2>Painel de Administração</h2>
+            <div class="admin-form">
+                <div class="admin-form-group">
+                    <label for="raffle-id">ID da Rifa:</label>
+                    <select id="raffle-id">
+                        <option value="new">Nova Rifa</option>
+                    </select>
                 </div>
-            </div>
-            
-            <ul class="nav nav-tabs" id="mainTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-pane" type="button" role="tab" aria-controls="table-pane" aria-selected="true">
-                        <i class="fas fa-table me-2"></i>Tabela
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="duplicates-tab" data-bs-toggle="tab" data-bs-target="#duplicates-pane" type="button" role="tab" aria-controls="duplicates-pane" aria-selected="false">
-                        <i class="fas fa-clone me-2"></i>Duplicados
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pivot-tab" data-bs-toggle="tab" data-bs-target="#pivot-pane" type="button" role="tab" aria-controls="pivot-pane">
-                        <i class="fas fa-sync-alt me-2"></i>Tabela Dinâmica
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats-pane" type="button" role="tab" aria-controls="stats-pane">
-                        <i class="fas fa-chart-line me-2"></i>Estatísticas
-                    </button>
-                </li>
-                <!-- Nova aba Sobre -->
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about-pane" type="button" role="tab" aria-controls="about-pane">
-                        <i class="fas fa-info-circle me-2"></i>Sobre
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="mainTabContent">
-                <!-- Aba Tabela -->
-                <div class="tab-pane fade show active" id="table-pane" role="tabpanel" aria-labelledby="table-tab">
-                    <div class="filter-section">
-                        <div class="controls-row">
-                            <div>
-                                <input class="form-control form-control-sm" id="globalSearch" placeholder="Pesquisar em todas as colunas..." type="text" style="max-width: 300px;">
-                            </div>
-                            <div class="btn-group-actions">
-                                <button class="btn btn-sm btn-success btn-action" id="exportCsvBtn">
-                                    <i class="fas fa-file-csv"></i> CSV
-                                </button>
-                                <button class="btn btn-sm btn-success btn-action" id="exportExcelBtn">
-                                    <i class="fas fa-file-excel"></i> Excel
-                                </button>
-                                <button class="btn btn-sm btn-danger btn-action" id="clearFiltersBtn">
-                                    <i class="fas fa-filter-circle-xmark"></i> Limpar
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="frozen-controls">
-                            <div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="freezeHeaderToggle" checked>
-                                    <label class="form-check-label" for="freezeHeaderToggle">Cabeçalho Fixo</label>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="freezeFirstColToggle" checked>
-                                    <label class="form-check-label" for="freezeFirstColToggle">1ª Coluna Fixa</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="numeric-filter-card">
-                            <div class="row g-2">
-                                <div class="col-md-3">
-                                    <select id="numericColumnSelect" class="form-select form-select-sm">
-                                        <option value="">Selecione coluna</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <select id="numericOperatorSelect" class="form-select form-select-sm">
-                                        <option value=">">Maior que</option>
-                                        <option value="<">Menor que</option>
-                                        <option value="=">Igual a</option>
-                                        <option value="between">Entre</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" id="numericValueInput" class="form-control form-control-sm" placeholder="Valor">
-                                </div>
-                                <div class="col-md-2" id="numericValueInput2Container" style="display:none;">
-                                    <input type="number" id="numericValueInput2" class="form-control form-control-sm" placeholder="e">
-                                </div>
-                                <div class="col-md-3">
-                                    <button class="btn btn-sm btn-primary w-100" id="applyNumericFilter">
-                                        <i class="fas fa-plus me-1"></i> Adicionar
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="activeNumericFilters" class="mt-2"></div>
-                        </div>
-                        
-                        <div class="filters-row" id="filtersRow"></div>
-                        <div id="activeFilters" class="d-flex flex-wrap mt-2"></div>
-                    </div>
-                    
-                    <div class="table-container frozen-header frozen-first-col" id="tableContainer">
-                        <table class="table table-striped table-hover" id="dataTable">
-                            <thead>
-                                <tr id="tableHeader"></tr>
-                            </thead>
-                            <tbody id="tableBody"></tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <div id="paginationControls" class="pagination-controls"></div>
-                        <div class="text-muted small">
-                            <i class="fas fa-database me-1"></i>
-                            Total: <span id="totalRecords">0</span> registros
-                        </div>
-                    </div>
+                <div class="admin-form-group">
+                    <label for="raffle-title">Título:</label>
+                    <input type="text" id="raffle-title" required>
                 </div>
-                
-                <!-- Aba Duplicados -->
-                <div class="tab-pane fade" id="duplicates-pane" role="tabpanel" aria-labelledby="duplicates-tab">
-                    <div class="filter-section">
-                        <h5 class="mb-3"><i class="fas fa-clone me-2"></i> Valores Duplicados por Coluna</h5>
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <div class="mb-2">
-                                    <label class="small">Selecione a coluna:&nbsp;
-                                        <select id='dupColSelect' class='form-select form-select-sm'>
-                                            <option value='_ALL_'>Todas as colunas</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <button class="btn btn-sm btn-success" id="exportDuplicatesBtn">
-                                    <i class="fas fa-file-export me-1"></i> Exportar
-                                </button>
-                            </div>
-                        </div>
-                        <div id="duplicatesTableDiv" class="mt-3"></div>
-                    </div>
+                <div class="admin-form-group">
+                    <label for="raffle-description">Descrição:</label>
+                    <textarea id="raffle-description" required></textarea>
                 </div>
-                
-                <!-- Aba Tabela Dinâmica -->
-                <div class="tab-pane fade" id="pivot-pane" role="tabpanel" aria-labelledby="pivot-tab">
-                    <div class="filter-section">
-                        <div class="controls-row">
-                            <h5 class="mb-0"><i class="fas fa-sync-alt me-2"></i> Tabela Dinâmica</h5>
-                            <div class="btn-group-actions">
-                                <button class="btn btn-sm btn-success" id="exportPivotCsvBtn">
-                                    <i class="fas fa-file-csv me-1"></i> CSV
-                                </button>
-                                <button class="btn btn-sm btn-success" id="exportPivotExcelBtn">
-                                    <i class="fas fa-file-excel me-1"></i> Excel
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="frozen-controls">
-                            <div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="freezePivotHeaderToggle" checked>
-                                    <label class="form-check-label" for="freezePivotHeaderToggle">Cabeçalho Fixo</label>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="freezePivotFirstColToggle" checked>
-                                    <label class="form-check-label" for="freezePivotFirstColToggle">1ª Coluna Fixa</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row g-2 mt-2">
-                            <div class="col-md-3">
-                                <label class="small">Linhas:</label>
-                                <select class="form-select form-select-sm" id="pivotRowSelect"></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small">Colunas (opcional):</label>
-                                <select class="form-select form-select-sm" id="pivotColSelect">
-                                    <option value="">Nenhuma</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small">Valores:</label>
-                                <select class="form-select form-select-sm" id="pivotValueSelect"></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small">Agregação:</label>
-                                <select class="form-select form-select-sm" id="pivotAggSelect">
-                                    <option value="sum">soma</option>
-                                    <option value="mean">média</option>
-                                    <option value="count">contagem</option>
-                                    <option value="max">máximo</option>
-                                    <option value="min">mínimo</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm mt-3" id="generatePivotBtn">
-                            <i class="fas fa-calculator me-1"></i> Gerar Tabela
+                <div class="admin-form-group">
+                    <label for="raffle-price">Valor por cota (R$):</label>
+                    <input type="number" id="raffle-price" min="1" step="0.01" required>
+                </div>
+                <div class="admin-form-group">
+                    <label for="total-numbers">Total de cotas:</label>
+                    <input type="number" id="total-numbers" min="1" required>
+                </div>
+                <div class="admin-form-group">
+                    <label for="raffle-image">URL da Imagem:</label>
+                    <input type="text" id="raffle-image">
+                </div>
+                <div class="admin-form-group">
+                    <label for="premium-numbers">Cotas premiadas (encontrou ganhou):</label>
+                    <div class="premium-numbers-input">
+                        <input type="text" id="premium-number-input" placeholder="Número da cota">
+                        <button type="button" class="btn-admin" id="add-premium-number" style="padding:8px;font-size:0.8rem;">
+                            Adicionar cota premiada
                         </button>
-                        
-                        <div class="pivot-table-container frozen-header frozen-first-col mt-3" id="pivotTableContainer">
-                            <table class="table table-bordered table-sm" id="pivotTable">
-                                <thead id="pivotHeader"></thead>
-                                <tbody id="pivotBody"></tbody>
-                            </table>
-                        </div>
+                        <div id="premium-numbers-list"></div>
                     </div>
                 </div>
                 
-                <!-- Aba Estatísticas -->
-                <div class="tab-pane fade" id="stats-pane" role="tabpanel" aria-labelledby="stats-tab">
-                    <div class="filter-section">
-                        <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i> Análise Estatística Detalhada</h5>
-                        <div class="stats-grid mb-4">
-                            <div class="stat-card">
-                                <h5><i class="fas fa-database me-2"></i> Total de Registros</h5>
-                                <div class="value" id="statTotalRecords">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <h5><i class="fas fa-filter me-2"></i> Registros Filtrados</h5>
-                                <div class="value" id="statFilteredRecords">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <h5><i class="fas fa-columns me-2"></i> Total de Colunas</h5>
-                                <div class="value" id="statTotalColumns">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <h5><i class="fas fa-percentage me-2"></i> Preenchimento</h5>
-                                <div class="value" id="statFillRate">0%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Estatísticas por Coluna</h6>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-secondary" id="expandAllStats">
-                                    <i class="fas fa-expand me-1"></i> Expandir Tudo
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" id="collapseAllStats">
-                                    <i class="fas fa-compress me-1"></i> Recolher Tudo
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion stats-accordion" id="columnStatsAccordion">
-                            <!-- Acordeões serão gerados dinamicamente para todas as colunas -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Nova aba Sobre -->
-                <div class="tab-pane fade" id="about-pane" role="tabpanel" aria-labelledby="about-tab">
-                    <div class="filter-section">
-                        <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i> Sobre o Data Explorer</h5>
-                        <div class="about-content">
-                            <p>O Data Explorer é uma ferramenta de análise de dados que funciona inteiramente no seu navegador. Você pode carregar arquivos CSV ou Excel para explorar e analisar seus dados sem enviar informações para servidores externos.</p>
-                            
-                            <h6>Como Funciona</h6>
-                            <ol>
-                                <li><strong>Carregue seu arquivo</strong>: Use o botão "Carregar arquivo" para selecionar um arquivo CSV ou Excel do seu computador.</li>
-                                <li><strong>Explore os dados</strong>: Na aba Tabela, você pode visualizar seus dados, aplicar filtros e ordenar informações.</li>
-                                <li><strong>Analise duplicatas</strong>: Use a aba Duplicados para identificar valores repetidos em suas colunas.</li>
-                                <li><strong>Crie tabelas dinâmicas</strong>: Na aba Tabela Dinâmica, você pode agrupar e resumir seus dados de várias formas.</li>
-                                <li><strong>Veja estatísticas</strong>: A aba Estatísticas fornece análises detalhadas sobre cada coluna do seu conjunto de dados.</li>
-                            </ol>
-                            
-                            <div class="feature-list">
-                                <div class="feature-card">
-                                    <i class="fas fa-lock"></i>
-                                    <h6>Segurança</h6>
-                                    <p>Todos os dados são processados localmente em seu navegador. Seus arquivos nunca são enviados para servidores externos.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <i class="fas fa-bolt"></i>
-                                    <h6>Performance</h6>
-                                    <p>Otimizado para lidar com conjuntos de dados de tamanho médio (até 100.000 linhas) com eficiência.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <i class="fas fa-download"></i>
-                                    <h6>Exportação</h6>
-                                    <p>Exporte dados filtrados, tabelas dinâmicas e relatórios de duplicatas em CSV ou Excel.</p>
-                                </div>
-                                <div class="feature-card">
-                                    <i class="fas fa-sliders-h"></i>
-                                    <h6>Filtros Avançados</h6>
-                                    <p>Filtre por valores específicos, faixas numéricas e buscas globais com interface intuitiva.</p>
-                                </div>
-                            </div>
-                            
-                            <h6>Limitações</h6>
-                            <ul>
-                                <li>A ferramenta funciona inteiramente no navegador, portanto o desempenho depende do seu dispositivo;</li>
-                                <li>Arquivos muito grandes (acima de 100.000 linhas) podem ter desempenho reduzido;</li>
-                                <li>Colunas em branco podem afetar o comportamento (seleção) dos filtros;</li>
-                                <li>Formatos de data e hora complexos podem não ser interpretados corretamente;</li>
-                                <li>Arquivos Excel com múltiplas planilhas processarão apenas a primeira planilha.</li>
-                            </ul>
-                            
-                            <div class="security-badge">
-                                <i class="fas fa-shield-alt me-2"></i> 
-                                <strong>Segurança dos dados</strong>: 
-                                Todos os processamentos ocorrem localmente no seu navegador. 
-                                Seus arquivos <u>nunca são enviados</u> para servidores externos e são mantidos apenas durante sua sessão no navegador.
-                            </div>
-                        </div>
-                    </div>
+                <button class="btn-admin" id="save-raffle">Salvar Rifa</button>
+                <button class="btn-admin" id="make-admin" style="background:var(--info);">
+                    <i class="fas fa-user-crown"></i> Tornar-se Administrador
+                </button>
+            </div>
+            
+            <div class="reservations-panel" id="reservations-panel" style="display: none;">
+                <h3>Reservas Pendentes</h3>
+                <div class="reservations-list" id="reservations-list">
+                    <!-- Reservas serão carregadas aqui -->
                 </div>
             </div>
             
-            <div class="footer-credit">
-                <p>Data Explorer v2.0 🦎 wendell.enter@mail.com</p>
+            <div class="winner-input-section" id="winner-input-section" style="display: none;">
+                <h3>Definir Vencedor</h3>
+                <div class="admin-form">
+                    <div class="admin-form-group">
+                        <label for="winner-number">Número vencedor:</label>
+                        <input type="number" id="winner-number" min="1">
+                    </div>
+                    <button class="btn-admin" id="set-winner">Definir Vencedor</button>
+                    <button class="btn-admin" id="auto-draw" style="background:var(--danger);">
+                        <i class="fas fa-random"></i> Sortear Automaticamente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar" id="status-bar">
+            <div id="status-text">Carregando rifas...</div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Todas</button>
+                <button class="filter-btn" data-filter="active">Ativas</button>
+                <button class="filter-btn" data-filter="completed">Sorteadas</button>
+            </div>
+        </div>
+        
+        <div class="raffles-grid" id="raffles-container">
+            <div style="text-align:center;padding:40px;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando rifas...
+            </div>
+        </div>
+        
+        <footer class="footer">
+            Desenvolvido por Wendell Moura
+        </footer>
+    </div>
+
+    <!-- Modal de instruções -->
+    <div class="modal" id="instructions-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Como Funciona</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Bem-vindo ao sistema de rifas online:</strong></p>
+                <ol style="padding-left:20px;margin:10px 0;">
+                    <li>Escolha uma rifa disponível</li>
+                    <li>Selecione as cotas desejadas</li>
+                    <li>Clique em "Reservar Cotas"</li>
+                    <li>Realize o pagamento em até 24h</li>
+                    <li>Envie o comprovante via WhatsApp</li>
+                    <li>Aguarde confirmação do administrador</li>
+                </ol>
+                <p><strong>Importante:</strong> Reservas expiram em 24 horas sem pagamento.</p>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-    <script>
-        // Variáveis globais
-        let allData = [];
-        let columns = [];
-        let filteredData = [];
-        let rowsPerPage = 100;
-        let currentPage = 1;
-        let sortCol = null;
-        let sortDir = null;
-        let allDuplicates = {};
-        let numericFilters = [];
+    <!-- Modal de Compra -->
+    <div class="modal" id="purchase-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Reservar Cotas</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 id="purchase-title" style="margin-bottom:15px;">Carregando...</h3>
+                
+                <div class="purchase-summary">
+                    <p><strong>Cotas:</strong> <span id="purchase-numbers">0</span></p>
+                    <p><strong>Quantidade:</strong> <span id="purchase-quantity">0</span></p>
+                    <p><strong>Valor unitário:</strong> <span id="purchase-price">R$ 0,00</span></p>
+                    <p><strong>Total:</strong> <span id="purchase-total">R$ 0,00</span></p>
+                </div>
+                
+                <div class="code-generated">
+                    <div class="code-label">Código de reserva:</div>
+                    <div class="code-value" id="purchase-code">RIFA-XXXX-XXXX</div>
+                </div>
+                
+                <p class="warning-note">
+                    <i class="fas fa-exclamation-circle"></i> Reserva expira em 24 horas
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" id="btn-close-purchase">Fechar</button>
+                <button class="btn-whatsapp" id="btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Enviar comprovante
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // Fechar dropdowns ao clicar fora
-        document.addEventListener('click', function(event) {
-            const dropdowns = document.querySelectorAll('.dropdown-checkbox');
-            dropdowns.forEach(dropdown => {
-                if (!dropdown.contains(event.target)) {
-                    dropdown.classList.remove('show');
-                    const menu = dropdown.querySelector('.dropdown-menu');
-                    if (menu) menu.style.display = 'none';
-                }
-            });
-        });
+    <!-- Modal de Token -->
+    <div class="modal" id="token-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Seu Token</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Guarde este token para acessar em qualquer dispositivo:</p>
+                <div style="background:var(--body-bg);padding:15px;border-radius:6px;margin:15px 0;text-align:center;word-break:break-all;">
+                    <strong id="token-display">TOK-XXXXXXXX</strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-admin" id="copy-token" style="width:100%;">
+                    <i class="fas fa-copy"></i> Copiar Token
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // Função para carregar o arquivo
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+    <!-- Modal de Configuração de Token -->
+    <div class="modal" id="token-setup-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Configuração do Token</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;gap:10px;margin-bottom:15px;">
+                    <button class="filter-btn active" id="tab-new-token">Novo Token</button>
+                    <button class="filter-btn" id="tab-existing-token">Token Existente</button>
+                </div>
+                
+                <div id="new-token-form" style="display:block;">
+                    <div class="admin-form-group">
+                        <label for="user-name-input">Seu Nome</label>
+                        <input type="text" id="user-name-input" placeholder="Ex: João Silva">
+                    </div>
+                    <button class="btn-admin" id="btn-create-token">Criar Novo Token</button>
+                </div>
+                
+                <div id="existing-token-form" style="display:none;">
+                    <div class="admin-form-group">
+                        <label for="existing-token">Cole seu Token</label>
+                        <input type="text" id="existing-token" placeholder="TOK-ABCD1234">
+                    </div>
+                    <button class="btn-admin" id="btn-use-token">Usar Token</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            const extension = file.name.split('.').pop().toLowerCase();
-            if (extension === 'csv') {
-                parseCSV(file);
-            } else if (extension === 'xlsx' || extension === 'xls') {
-                parseExcel(file);
+    <!-- Modal de Login Admin -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Login Admin</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="admin-form">
+                    <div class="admin-form-group">
+                        <label for="admin-email">E-mail:</label>
+                        <input type="email" id="admin-email" required>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="admin-password">Senha:</label>
+                        <input type="password" id="admin-password" required>
+                    </div>
+                    <button class="btn-admin" id="btn-login">Entrar</button>
+                    <div id="login-error" style="color:var(--danger);text-align:center;margin-top:10px;display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB6QBLSwTbtYAn_6zj9RLKGD13Dxyj_us",
+        authDomain: "projetorifa-fcba2.firebaseapp.com",
+        projectId: "projetorifa-fcba2",
+        storageBucket: "projetorifa-fcba2.firebasestorage.app",
+        messagingSenderId: "605517680323",
+        appId: "1:605517680323:web:8f318c9888a40215559c76",
+        measurementId: "G-DHR5J8DV6P"
+    };
+
+    // Inicializar Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    // Elementos DOM
+    const rafflesContainer = document.getElementById('raffles-container');
+    const tokenBtn = document.getElementById('token-btn');
+    const tokenModal = document.getElementById('token-modal');
+    const tokenSetupModal = document.getElementById('token-setup-modal');
+    const tokenDisplay = document.getElementById('token-display');
+    const copyTokenBtn = document.getElementById('copy-token');
+    const instructionsBtn = document.getElementById('instructions-btn');
+    const instructionsModal = document.getElementById('instructions-modal');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const adminToggle = document.getElementById('admin-toggle');
+    const adminPanel = document.getElementById('admin-panel');
+    const raffleIdSelect = document.getElementById('raffle-id');
+    const saveRaffleBtn = document.getElementById('save-raffle');
+    const makeAdminBtn = document.getElementById('make-admin');
+    const loginModal = document.getElementById('login-modal');
+    const adminEmailInput = document.getElementById('admin-email');
+    const adminPasswordInput = document.getElementById('admin-password');
+    const btnLogin = document.getElementById('btn-login');
+    const loginError = document.getElementById('login-error');
+    const btnLogout = document.getElementById('btn-logout');
+    const purchaseModal = document.getElementById('purchase-modal');
+    const btnWhatsapp = document.getElementById('btn-whatsapp');
+    const btnClosePurchase = document.getElementById('btn-close-purchase');
+    const firebaseStatus = document.getElementById('firebase-status');
+    const adminInfo = document.getElementById('admin-info');
+    const userInfo = document.getElementById('user-info');
+    const userNameDisplay = document.getElementById('user-name');
+    const statusText = document.getElementById('status-text');
+    const purchaseTitle = document.getElementById('purchase-title');
+    const purchaseNumbers = document.getElementById('purchase-numbers');
+    const purchaseQuantity = document.getElementById('purchase-quantity');
+    const purchasePrice = document.getElementById('purchase-price');
+    const purchaseTotal = document.getElementById('purchase-total');
+    const purchaseCode = document.getElementById('purchase-code');
+    const tabNewToken = document.getElementById('tab-new-token');
+    const tabExistingToken = document.getElementById('tab-existing-token');
+    const newTokenForm = document.getElementById('new-token-form');
+    const existingTokenForm = document.getElementById('existing-token-form');
+    const btnCreateToken = document.getElementById('btn-create-token');
+    const btnUseToken = document.getElementById('btn-use-token');
+    const userNameInput = document.getElementById('user-name-input');
+    const existingTokenInput = document.getElementById('existing-token');
+    const premiumNumberInput = document.getElementById('premium-number-input');
+    const addPremiumNumberBtn = document.getElementById('add-premium-number');
+    const premiumNumbersList = document.getElementById('premium-numbers-list');
+    const totalNumbersInput = document.getElementById('total-numbers');
+    const reservationsPanel = document.getElementById('reservations-panel');
+    const reservationsList = document.getElementById('reservations-list');
+    const winnerInputSection = document.getElementById('winner-input-section');
+    const winnerNumberInput = document.getElementById('winner-number');
+    const setWinnerBtn = document.getElementById('set-winner');
+    const autoDrawBtn = document.getElementById('auto-draw');
+
+    // Estado da aplicação
+    let userToken = localStorage.getItem('userToken') || null;
+    let userName = localStorage.getItem('userName') || null;
+    let currentFilter = 'all';
+    let raffles = [];
+    let userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
+    let unsubscribeRaffles = null;
+    let currentRaffle = null;
+    let selectedNumbers = [];
+    let currentPurchaseCode = null;
+    let premiumNumbers = [];
+    let currentAdminUserId = null;
+    let isProcessingReservation = false;
+
+    // Número do WhatsApp para contato
+    const whatsappNumber = "5511999999999";
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        adminInfo.style.display = 'none';
+        userInfo.style.display = 'none';
+        adminPanel.style.display = 'none';
+        reservationsPanel.style.display = 'none';
+        winnerInputSection.style.display = 'none';
+        
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentAdminUserId = user.uid;
+                updateUIOnChanges();
             } else {
-                alert('Formato de arquivo não suportado. Use CSV ou Excel.');
+                currentAdminUserId = null;
+                updateUIOnChanges();
             }
         });
 
-        function parseCSV(file) {
-            Papa.parse(file, {
-                header: true,
-                dynamicTyping: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    if (results.errors.length) {
-                        console.error('Erros no parse:', results.errors);
-                        alert('Ocorreram erros ao processar o arquivo CSV.');
-                    }
-                    processData(results.data, results.meta.fields);
-                }
-            });
+        if (!userToken) {
+            tokenSetupModal.style.display = 'flex';
+        } else {
+            loadRaffles();
         }
+        
+        // Event listeners
+        tokenBtn.addEventListener('click', showTokenModal);
+        copyTokenBtn.addEventListener('click', copyTokenToClipboard);
+        instructionsBtn.addEventListener('click', () => {
+            instructionsModal.style.display = 'flex';
+        });
+        btnLogout.addEventListener('click', handleLogout);
+        btnClosePurchase.addEventListener('click', () => {
+            purchaseModal.style.display = 'none';
+        });
+        
+        // Filtros
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderRaffles();
+            });
+        });
+        
+        // Admin
+        adminToggle.addEventListener('click', toggleAdminPanel);
+        saveRaffleBtn.addEventListener('click', saveRaffle);
+        makeAdminBtn.addEventListener('click', makeAdmin);
+        btnLogin.addEventListener('click', handleLogin);
+        raffleIdSelect.addEventListener('change', fillAdminForm);
+        setWinnerBtn.addEventListener('click', setWinner);
+        autoDrawBtn.addEventListener('click', autoDrawWinner);
+        
+        // Token Setup Tabs
+        tabNewToken.addEventListener('click', () => {
+            tabNewToken.classList.add('active');
+            tabExistingToken.classList.remove('active');
+            newTokenForm.style.display = 'block';
+            existingTokenForm.style.display = 'none';
+        });
+        
+        tabExistingToken.addEventListener('click', () => {
+            tabExistingToken.classList.add('active');
+            tabNewToken.classList.remove('active');
+            newTokenForm.style.display = 'none';
+            existingTokenForm.style.display = 'block';
+        });
+        
+        // Criar token
+        btnCreateToken.addEventListener('click', createNewToken);
+        btnUseToken.addEventListener('click', useExistingToken);
+        
+        // Premium numbers
+        addPremiumNumberBtn.addEventListener('click', addPremiumNumber);
+        
+        // Fechar modais
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+        
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+        
+        // Load raffles on retry
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'retry-load') {
+                loadRaffles();
+            }
+        });
+    });
 
-        function parseExcel(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    function updateUIOnChanges() {
+        const user = auth.currentUser;
+        
+        if (user) {
+            userInfo.style.display = 'flex';
+            userNameDisplay.textContent = user.displayName || user.email || "Usuário";
+            
+            // Verificar se é admin
+            checkAdminStatus(user.uid).then(isAdminUser => {
+                if (isAdminUser) {
+                    adminInfo.style.display = 'block';
+                    reservationsPanel.style.display = 'block';
+                    userIsAdmin = true;
+                    localStorage.setItem('userIsAdmin', 'true');
+                    loadPendingReservations();
+                } else {
+                    adminInfo.style.display = 'none';
+                    reservationsPanel.style.display = 'none';
+                    userIsAdmin = false;
+                    localStorage.setItem('userIsAdmin', 'false');
+                }
+            }).catch(error => {
+                console.error("Erro em updateUIOnChanges:", error);
+                adminInfo.style.display = 'none';
+                reservationsPanel.style.display = 'none';
+                userIsAdmin = false;
+                localStorage.setItem('userIsAdmin', 'false');
+            });
+        } else {
+            userInfo.style.display = 'none';
+            adminInfo.style.display = 'none';
+            reservationsPanel.style.display = 'none';
+            winnerInputSection.style.display = 'none';
+            userIsAdmin = false;
+            localStorage.setItem('userIsAdmin', 'false');
+        }
+    }
 
-                if (jsonData.length < 1) {
-                    alert('A planilha está vazia.');
+    function checkAdminStatus(userId) {
+        if (!userId) {
+            return Promise.resolve(false);
+        }
+        
+        return db.collection("admins").doc(userId).get()
+            .then(doc => doc.exists)
+            .catch(error => {
+                console.error("Erro ao verificar admin:", error);
+                return false;
+            });
+    }
+
+    function createNewToken() {
+        const name = userNameInput.value.trim();
+        
+        if (!name || name.length < 2) {
+            showToast('Insira um nome com pelo menos 2 caracteres', 'error');
+            return;
+        }
+        
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomPart = '';
+        for (let i = 0; i < 8; i++) {
+            randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        
+        userToken = 'TOK-' + randomPart;
+        
+        localStorage.setItem('userToken', userToken);
+        localStorage.setItem('userName', name);
+        userName = name;
+        
+        db.collection("users").doc(userToken).set({
+            name: name,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            tokenSetupModal.style.display = 'none';
+            tokenDisplay.textContent = userToken;
+            tokenModal.style.display = 'flex';
+            showToast('Token criado com sucesso!', 'success');
+            loadRaffles();
+        })
+        .catch(error => {
+            console.error("Erro ao salvar token:", error);
+            showToast('Erro ao criar token. Tente novamente.', 'error');
+        });
+    }
+
+    function useExistingToken() {
+        let token = existingTokenInput.value.trim().toUpperCase();
+        
+        if (!token.startsWith('TOK-') || token.length !== 12) {
+            showToast('Token inválido. Formato: TOK-XXXXXXXX', 'error');
+            return;
+        }
+        
+        db.collection("users").doc(token).get()
+        .then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                
+                localStorage.setItem('userToken', token);
+                localStorage.setItem('userName', userData.name);
+                userToken = token;
+                userName = userData.name;
+                
+                tokenSetupModal.style.display = 'none';
+                showToast('Token carregado! Bem-vindo!', 'success');
+                loadRaffles();
+            } else {
+                showToast('Token não encontrado.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao verificar token:", error);
+            showToast('Erro ao verificar token.', 'error');
+        });
+    }
+
+    function loadRaffles() {
+        firebaseStatus.style.display = 'block';
+        firebaseStatus.textContent = 'Conectando ao sistema...';
+        
+        unsubscribeRaffles = db.collection("raffles").onSnapshot(
+            snapshot => {
+                firebaseStatus.style.display = 'none';
+                raffles = [];
+                
+                if (snapshot.empty) {
+                    rafflesContainer.innerHTML = `
+                        <div style="text-align:center;padding:40px;color:var(--secondary);">
+                            <i class="fas fa-box-open" style="font-size:3rem;margin-bottom:15px;"></i>
+                            <h3>Nenhuma rifa disponível</h3>
+                            <p>Crie uma rifa no painel administrativo</p>
+                        </div>
+                    `;
+                    statusText.textContent = "Nenhuma rifa encontrada";
                     return;
                 }
-
-                // A primeira linha é o cabeçalho
-                const headers = jsonData[0];
-                const rows = jsonData.slice(1);
-                const dataObjects = rows.map(row => {
-                    const obj = {};
-                    headers.forEach((header, i) => {
-                        obj[header] = row[i];
-                    });
-                    return obj;
-                });
-
-                processData(dataObjects, headers);
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function processData(data, headers) {
-            allData = data.filter(row => {
-                return headers.some(header => row[header] !== undefined);
-            });
-            columns = headers;
-
-            // Calcular duplicados
-            calculateDuplicates();
-
-            // Inicializar a interface
-            initTable();
-            initFilters();
-            initDuplicates();
-            initPivotControls();
-            initNumericFilters();
-            generateStats();
-
-            // Ativar a aba de tabela
-            document.getElementById('table-tab').click();
-        }
-
-        function calculateDuplicates() {
-            allDuplicates = {};
-            columns.forEach(col => {
-                const counts = {};
-                allData.forEach(row => {
-                    const val = row[col];
-                    if (val !== undefined && val !== null) {
-                        const strVal = String(val);
-                        counts[strVal] = (counts[strVal] || 0) + 1;
-                    }
+                
+                snapshot.forEach(doc => {
+                    raffles.push({ id: doc.id, ...doc.data() });
                 });
                 
-                const duplicates = [];
-                for (const [val, count] of Object.entries(counts)) {
-                    if (count > 1) {
-                        duplicates.push([val, count]);
-                    }
-                }
+                renderRaffles();
+                updateAdminRaffleSelect();
+            },
+            error => {
+                console.error("Erro ao carregar rifas: ", error);
                 
-                if (duplicates.length > 0) {
-                    allDuplicates[col] = duplicates;
-                }
-            });
-        }
+                const errorMsg = error.code === 'permission-denied' ? 
+                    "Permissão negada. Configure as regras do Firebase" : 
+                    "Erro ao conectar. Tente novamente.";
 
-        function initTable() {
-            // Limpar a tabela
-            document.getElementById('tableHeader').innerHTML = '';
-            document.getElementById('tableBody').innerHTML = '';
-
-            // Adicionar cabeçalhos
-            columns.forEach((col, i) => {
-                const th = document.createElement('th');
-                th.className = 'sortable';
-                th.setAttribute('data-col', i);
-                th.textContent = col;
-                document.getElementById('tableHeader').appendChild(th);
-            });
-
-            // Renderizar os dados
-            filteredData = [...allData];
-            renderTable(filteredData);
-
-            // Adicionar event listeners para ordenação
-            document.querySelectorAll('#tableHeader th.sortable').forEach(th => {
-                th.addEventListener('click', function() {
-                    const colIdx = parseInt(this.getAttribute('data-col'));
-                    if (sortCol === colIdx) {
-                        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        sortCol = colIdx;
-                        sortDir = 'asc';
-                    }
-                    // Atualizar classes de ordenação
-                    document.querySelectorAll('#tableHeader th.sortable').forEach(h => {
-                        h.classList.remove('sorted-asc', 'sorted-desc');
-                    });
-                    this.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
-                    renderTable(filteredData);
-                });
-            });
-
-            // Atualizar controles de congelamento
-            document.getElementById('freezeHeaderToggle').addEventListener('change', updateFreezeSettings);
-            document.getElementById('freezeFirstColToggle').addEventListener('change', updateFreezeSettings);
-            document.getElementById('freezePivotHeaderToggle').addEventListener('change', updatePivotFreezeSettings);
-            document.getElementById('freezePivotFirstColToggle').addEventListener('change', updatePivotFreezeSettings);
-            
-            // Configurar exportação
-            document.getElementById('exportCsvBtn').addEventListener('click', exportToCsv);
-            document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-            document.getElementById('exportPivotCsvBtn').addEventListener('click', exportPivotToCsv);
-            document.getElementById('exportPivotExcelBtn').addEventListener('click', exportPivotToExcel);
-            document.getElementById('exportDuplicatesBtn').addEventListener('click', exportDuplicates);
-            
-            // Correção para os filtros
-            document.getElementById('globalSearch').addEventListener('input', applyFilters);
-            document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-        }
-
-        function updateFreezeSettings() {
-            const container = document.getElementById('tableContainer');
-            const freezeHeader = document.getElementById('freezeHeaderToggle').checked;
-            const freezeFirstCol = document.getElementById('freezeFirstColToggle').checked;
-            
-            container.className = 'table-container';
-            if (freezeHeader) container.classList.add('frozen-header');
-            if (freezeFirstCol) container.classList.add('frozen-first-col');
-        }
-
-        function updatePivotFreezeSettings() {
-            const container = document.getElementById('pivotTableContainer');
-            const freezeHeader = document.getElementById('freezePivotHeaderToggle').checked;
-            const freezeFirstCol = document.getElementById('freezePivotFirstColToggle').checked;
-            
-            container.className = 'pivot-table-container';
-            if (freezeHeader) container.classList.add('frozen-header');
-            if (freezeFirstCol) container.classList.add('frozen-first-col');
-        }
-
-        function initFilters() {
-            const filtersRow = document.getElementById('filtersRow');
-            filtersRow.innerHTML = '';
-
-            columns.forEach((col, i) => {
-                const dropdownDiv = document.createElement('div');
-                dropdownDiv.className = 'dropdown-checkbox';
-                dropdownDiv.innerHTML = `
-                    <span class="dropdown-toggle btn btn-light btn-sm border" onclick="toggleDropdown(${i})">${col}</span>
-                    <div class="dropdown-menu" id="menu_${i}">
-                        <input type="text" placeholder="Buscar..." class="form-control form-control-sm mb-2" onkeyup="filterCheckboxes(${i}, this.value)" onmousedown="event.stopPropagation()">
-                        <div class="dropdown-scroll" style="max-height:220px;overflow-y:auto;padding-right:3px;">
-                            <label>
-                                <input type="checkbox" class="filter-checkbox" data-col="${i}" value="__ALL__" checked onchange="allCheck(${i})"> <b>Todos</b>
-                            </label>
-                        </div>
+                firebaseStatus.textContent = errorMsg;
+                
+                rafflesContainer.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:var(--danger);">
+                        <i class="fas fa-exclamation-triangle" style="font-size:3rem;margin-bottom:15px;"></i> 
+                        <p>${errorMsg}</p>
+                        <button class="btn-admin" style="margin-top:15px;" id="retry-load">Tentar Novamente</button>
                     </div>
                 `;
-                filtersRow.appendChild(dropdownDiv);
-
-                // Preencher opções do filtro
-                const values = [...new Set(allData.map(row => row[col]))].filter(v => v != null);
-                values.sort((a, b) => String(a).localeCompare(String(b)));
-                const menu = document.getElementById(`menu_${i}`);
-                const checksDiv = menu.querySelector('.dropdown-scroll');
-                values.forEach(val => {
-                    const label = document.createElement('label');
-                    const strVal = String(val);
-                    label.innerHTML = `<input type="checkbox" class="filter-checkbox" data-col="${i}" value="${strVal}"> ${strVal}`;
-                    checksDiv.appendChild(label);
-                });
-            });
-
-            // Evento de mudança nos checkboxes
-            document.querySelectorAll('.filter-checkbox').forEach(cb => {
-                cb.addEventListener('change', function() {
-                    if (this.value !== "__ALL__") {
-                        const menu = this.closest('.dropdown-menu');
-                        const allCb = menu.querySelector('.filter-checkbox[value="__ALL__"]');
-                        if (allCb) allCb.checked = false;
-                    }
-                    applyFilters();
-                });
-            });
-        }
-
-        function initDuplicates() {
-            const dupColSelect = document.getElementById('dupColSelect');
-            // Limpar e adicionar opções (exceto a primeira que é "Todas")
-            dupColSelect.innerHTML = '<option value="_ALL_">Todas as colunas</option>';
-            columns.forEach(col => {
-                const option = document.createElement('option');
-                option.value = col;
-                option.textContent = col;
-                dupColSelect.appendChild(option);
-            });
-            dupColSelect.addEventListener('change', function() {
-                renderDuplicatesTable(this.value);
-            });
-            renderDuplicatesTable('_ALL_');
-        }
-
-        function initPivotControls() {
-            const rowSelect = document.getElementById('pivotRowSelect');
-            const colSelect = document.getElementById('pivotColSelect');
-            const valueSelect = document.getElementById('pivotValueSelect');
-
-            // Limpar e preencher
-            rowSelect.innerHTML = '';
-            colSelect.innerHTML = '<option value="">Nenhuma</option>';
-            valueSelect.innerHTML = '';
-
-            columns.forEach(col => {
-                const option = document.createElement('option');
-                option.value = col;
-                option.textContent = col;
-
-                rowSelect.appendChild(option.cloneNode(true));
-                colSelect.appendChild(option.cloneNode(true));
-                valueSelect.appendChild(option.cloneNode(true));
-            });
-
-            // Botão gerar pivot
-            document.getElementById('generatePivotBtn').addEventListener('click', generatePivotTable);
-        }
-
-        function initNumericFilters() {
-            const select = document.getElementById('numericColumnSelect');
-            select.innerHTML = '<option value="">Selecione uma coluna</option>';
-            
-            columns.forEach(col => {
-                // Verificar se a coluna é numérica
-                const sampleValue = allData.find(d => d[col] !== undefined && d[col] !== null)?.[col];
-                if (typeof sampleValue === 'number') {
-                    const option = document.createElement('option');
-                    option.value = col;
-                    option.textContent = col;
-                    select.appendChild(option);
-                }
-            });
-            
-            // Mostrar/ocultar segundo campo para "Entre"
-            document.getElementById('numericOperatorSelect').addEventListener('change', function() {
-                const container = document.getElementById('numericValueInput2Container');
-                container.style.display = this.value === 'between' ? 'block' : 'none';
-            });
-            
-            // Aplicar filtro numérico
-            document.getElementById('applyNumericFilter').addEventListener('click', applyNumericFilter);
-        }
-
-        // Funções globais acessíveis
-        window.toggleDropdown = function(idx) {
-            const menu = document.getElementById(`menu_${idx}`);
-            const parent = menu.parentElement;
-            const isOpen = parent.classList.contains('show');
-            
-            // Fechar todos os dropdowns
-            document.querySelectorAll('.dropdown-checkbox').forEach(el => {
-                el.classList.remove('show');
-                const m = el.querySelector('.dropdown-menu');
-                if (m) m.style.display = 'none';
-            });
-            
-            if (!isOpen) {
-                parent.classList.add('show');
-                menu.style.display = 'block';
-                const btn = parent.querySelector('.dropdown-toggle');
-                const rect = btn.getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY) + 'px';
-                menu.style.left = (rect.left + window.scrollX) + 'px';
-                menu.style.width = rect.width + 'px';
-                
-                // Focar no campo de busca
-                setTimeout(() => {
-                    const input = menu.querySelector('input[type="text"]');
-                    if (input) input.focus();
-                }, 150);
             }
-        };
+        );
+    }
 
-        window.filterCheckboxes = function(idx, search) {
-            const menu = document.getElementById(`menu_${idx}`);
-            const labels = menu.querySelectorAll('.dropdown-scroll label');
-            search = search.toLowerCase();
-            
-            labels.forEach((label, i) => {
-                if (i === 0) return; // Pular o "Todos"
-                const text = label.textContent.toLowerCase();
-                if (text.includes(search)) {
-                    label.style.display = '';
-                } else {
-                    label.style.display = 'none';
-                }
-            });
-        };
-
-        window.allCheck = function(idx) {
-            const menu = document.getElementById(`menu_${idx}`);
-            const allCb = menu.querySelector('.filter-checkbox[value="__ALL__"]');
-            const checkboxes = menu.querySelectorAll('.filter-checkbox:not([value="__ALL__"])');
-            
-            if (allCb.checked) {
-                checkboxes.forEach(cb => cb.checked = false);
-            }
-            applyFilters();
-        };
-
-        function applyFilters() {
-            // Obter valores selecionados em cada filtro
-            const filters = {};
-            for (let i = 0; i < columns.length; i++) {
-                const menu = document.getElementById(`menu_${i}`);
-                if (!menu) continue;
-                
-                const checks = menu.querySelectorAll('.filter-checkbox:checked:not([value="__ALL__"])');
-                const values = Array.from(checks).map(cb => cb.value);
-                
-                if (values.length > 0) {
-                    filters[i] = values;
-                }
-            }
-            
-            // Obter termo de busca global
-            const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
-            
-            // Filtrar dados
-            filteredData = allData.filter(row => {
-                // Aplicar filtros de coluna
-                for (const [colIdx, values] of Object.entries(filters)) {
-                    const colName = columns[colIdx];
-                    const rowValue = row[colName];
-                    if (rowValue === undefined || rowValue === null) return false;
-                    
-                    const strValue = String(rowValue);
-                    if (!values.includes(strValue)) {
-                        return false;
-                    }
-                }
-                
-                // Aplicar filtros numéricos
-                for (const filter of numericFilters) {
-                    const rowValue = parseFloat(row[filter.column]);
-                    if (isNaN(rowValue)) return false;
-                    
-                    switch(filter.operator) {
-                        case '>': 
-                            if (rowValue <= filter.value) return false;
-                            break;
-                        case '<': 
-                            if (rowValue >= filter.value) return false;
-                            break;
-                        case '=': 
-                            if (rowValue !== filter.value) return false;
-                            break;
-                        case 'between': 
-                            if (rowValue < filter.value || rowValue > filter.value2) return false;
-                            break;
-                    }
-                }
-                
-                // Aplicar busca global
-                if (searchTerm) {
-                    let found = false;
-                    for (const col of columns) {
-                        const value = row[col];
-                        if (value !== undefined && value !== null) {
-                            if (String(value).toLowerCase().includes(searchTerm)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!found) return false;
-                }
-                
-                return true;
-            });
-            
-            currentPage = 1;
-            renderTable(filteredData);
-            updateActiveFilters(filters);
-            generateStats();
-        }
-
-        function applyNumericFilter() {
-            const column = document.getElementById('numericColumnSelect').value;
-            const operator = document.getElementById('numericOperatorSelect').value;
-            const value = parseFloat(document.getElementById('numericValueInput').value);
-            
-            if (!column) {
-                alert('Selecione uma coluna para aplicar o filtro');
-                return;
-            }
-            
-            if (isNaN(value)) {
-                alert('Digite um valor válido');
-                return;
-            }
-            
-            const newFilter = {
-                column: column,
-                operator: operator,
-                value: value
-            };
-            
-            if (operator === 'between') {
-                const value2 = parseFloat(document.getElementById('numericValueInput2').value);
-                if (isNaN(value2)) {
-                    alert('Digite o segundo valor para o intervalo');
-                    return;
-                }
-                newFilter.value2 = value2;
-            }
-            
-            // Verificar se o filtro já existe
-            const exists = numericFilters.some(f => 
-                f.column === column && 
-                f.operator === operator && 
-                f.value === value
-            );
-            
-            if (!exists) {
-                numericFilters.push(newFilter);
-                renderNumericFilters();
-                applyFilters();
-            }
-        }
-
-        function renderNumericFilters() {
-            const container = document.getElementById('activeNumericFilters');
-            container.innerHTML = '';
-            
-            if (numericFilters.length === 0) return;
-            
-            let html = '<div class="d-flex align-items-center flex-wrap gap-2"><strong>Filtros numéricos ativos:</strong>';
-            
-            numericFilters.forEach((filter, index) => {
-                let label = '';
-                switch(filter.operator) {
-                    case '>': label = `${filter.column} > ${filter.value}`; break;
-                    case '<': label = `${filter.column} < ${filter.value}`; break;
-                    case '=': label = `${filter.column} = ${filter.value}`; break;
-                    case 'between': label = `${filter.value} ≤ ${filter.column} ≤ ${filter.value2}`; break;
-                }
-                
-                html += `
-                    <span class="badge bg-primary badge-filter">
-                        ${label}
-                        <a href="#" onclick="removeNumericFilter(${index}); return false;"><i class="fas fa-times"></i></a>
-                    </span>
-                `;
-            });
-            
-            html += `<button class="btn btn-sm btn-danger" onclick="clearNumericFilters()">
-                <i class="fas fa-trash me-1"></i> Limpar Tudo
-            </button></div>`;
-            
-            container.innerHTML = html;
-        }
-
-        window.removeNumericFilter = function(index) {
-            numericFilters.splice(index, 1);
-            renderNumericFilters();
-            applyFilters();
-        };
-
-        window.clearNumericFilters = function() {
-            numericFilters = [];
-            renderNumericFilters();
-            applyFilters();
-        };
-
-        function renderTable(data) {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = '';
-            
-            const start = (currentPage - 1) * rowsPerPage;
-            const end = Math.min(start + rowsPerPage, data.length);
-            const pageData = data.slice(start, end);
-            
-            // Dados ordenados se necessário
-            let displayData = [...pageData];
-            if (sortCol !== null) {
-                displayData.sort((a, b) => {
-                    const valA = a[columns[sortCol]];
-                    const valB = b[columns[sortCol]];
-                    
-                    if (valA === valB) return 0;
-                    if (valA === undefined || valA === null) return 1;
-                    if (valB === undefined || valB === null) return -1;
-                    
-                    const strA = String(valA).toLowerCase();
-                    const strB = String(valB).toLowerCase();
-                    
-                    return sortDir === 'asc' ? 
-                        strA.localeCompare(strB) : 
-                        strB.localeCompare(strA);
-                });
-            }
-            
-            // Preencher tabela
-            displayData.forEach(row => {
-                const tr = document.createElement('tr');
-                columns.forEach(col => {
-                    const td = document.createElement('td');
-                    const value = row[col];
-                    td.textContent = value !== undefined && value !== null ? value : '';
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-            });
-            
-            // Atualizar controles de paginação
-            updatePaginationControls(data.length);
-            // Atualizar contagem de registros
-            document.getElementById('totalRecords').textContent = data.length;
-            // Destacar termos de busca
-            highlightSearch();
-        }
-
-        function updatePaginationControls(totalRows) {
-            const controls = document.getElementById('paginationControls');
-            const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
-            
-            controls.innerHTML = `
-                <button class="btn btn-sm btn-light" onclick="prevPage()" ${currentPage === 1 ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-left"></i> Anterior
-                </button>
-                <span class="mx-2">Página ${currentPage} de ${totalPages}</span>
-                <button class="btn btn-sm btn-light" onclick="nextPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>
-                    Próxima <i class="fas fa-chevron-right"></i>
-                </button>
-                <div class="ms-2 d-inline-flex align-items-center">
-                    <span class="me-2">Linhas:</span>
-                    <select class="form-select form-select-sm" style="width: 80px;" id="rowsPerPageSelect">
-                        <option value="50" ${rowsPerPage === 50 ? 'selected' : ''}>50</option>
-                        <option value="100" ${rowsPerPage === 100 ? 'selected' : ''}>100</option>
-                        <option value="200" ${rowsPerPage === 200 ? 'selected' : ''}>200</option>
-                        <option value="500" ${rowsPerPage === 500 ? 'selected' : ''}>500</option>
-                    </select>
-                </div>
-                <div class="page-jump">
-                    <input type="number" min="1" max="${totalPages}" id="goToPageInput" class="form-control form-control-sm" style="width: 70px;" placeholder="Pág">
-                    <button class="btn btn-sm btn-light" onclick="goToPage()">Ir</button>
+    function renderRaffles() {
+        if (raffles.length === 0) {
+            rafflesContainer.innerHTML = `
+                <div style="text-align:center;padding:40px;color:var(--secondary);">
+                    <i class="fas fa-box-open" style="font-size:3rem;margin-bottom:15px;"></i>
+                    <h3>Nenhuma rifa disponível</h3>
+                    <p>Crie uma rifa no painel administrativo</p>
                 </div>
             `;
-            
-            // Evento para alterar número de linhas por página
-            document.getElementById('rowsPerPageSelect').addEventListener('change', function() {
-                rowsPerPage = parseInt(this.value);
-                currentPage = 1;
-                renderTable(filteredData);
-            });
+            statusText.textContent = "Nenhuma rifa encontrada";
+            return;
         }
-
-        window.prevPage = function() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable(filteredData);
-            }
-        };
-
-        window.nextPage = function(totalPages) {
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderTable(filteredData);
-            }
-        };
-
-        window.goToPage = function() {
-            const input = document.getElementById('goToPageInput');
-            const page = parseInt(input.value);
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        
+        rafflesContainer.innerHTML = '';
+        
+        const filteredRaffles = raffles.filter(raffle => {
+            if (currentFilter === 'active' && raffle.status === 'completed') return false;
+            if (currentFilter === 'completed' && raffle.status !== 'completed') return false;
+            return true;
+        });
+        
+        filteredRaffles.forEach(raffle => {
+            const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
+            const pendingNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'pending').length : 0;
+            const totalSold = soldNumbers + pendingNumbers;
+            const progress = (totalSold / raffle.totalNumbers) * 100;
+            const isCompleted = raffle.status === 'completed';
             
-            if (isNaN(page)) {
-                alert('Digite um número válido');
-                return;
-            }
+            const card = document.createElement('div');
+            card.className = 'raffle-card';
+            card.dataset.id = raffle.id;
             
-            if (page < 1 || page > totalPages) {
-                alert(`Página deve estar entre 1 e ${totalPages}`);
-                return;
-            }
-            
-            currentPage = page;
-            renderTable(filteredData);
-        };
-
-        function updateActiveFilters(filters) {
-            const activeFilters = document.getElementById('activeFilters');
-            let html = '';
-            
-            for (const [colIdx, values] of Object.entries(filters)) {
-                const colName = columns[colIdx];
-                values.forEach(val => {
-                    html += `
-                        <span class="badge bg-info text-dark badge-filter">
-                            <i class="fas fa-filter me-1"></i> ${colName}: ${val}
-                            <a href="#" onclick="removeFilter(${colIdx}, '${val}'); return false;"><i class="fas fa-times"></i></a>
-                        </span>
-                    `;
-                });
-            }
-            
-            activeFilters.innerHTML = html;
-        }
-
-        window.removeFilter = function(colIdx, val) {
-            const menu = document.getElementById(`menu_${colIdx}`);
-            const checkboxes = menu.querySelectorAll('.filter-checkbox');
-            
-            checkboxes.forEach(cb => {
-                if (cb.value === val) {
-                    cb.checked = false;
-                }
-            });
-            
-            // Verificar se precisa marcar "Todos"
-            const checked = menu.querySelectorAll('.filter-checkbox:checked:not([value="__ALL__"])');
-            if (checked.length === 0) {
-                const allCb = menu.querySelector('.filter-checkbox[value="__ALL__"]');
-                if (allCb) allCb.checked = true;
-            }
-            
-            applyFilters();
-        };
-
-        function clearFilters() {
-            // Limpar todos os checkboxes
-            document.querySelectorAll('.filter-checkbox').forEach(cb => {
-                cb.checked = false;
-            });
-            
-            // Marcar "Todos" em cada dropdown
-            for (let i = 0; i < columns.length; i++) {
-                const menu = document.getElementById(`menu_${i}`);
-                if (menu) {
-                    const allCb = menu.querySelector('.filter-checkbox[value="__ALL__"]');
-                    if (allCb) allCb.checked = true;
-                }
-            }
-            
-            // Limpar busca global
-            document.getElementById('globalSearch').value = '';
-            
-            // Limpar filtros numéricos
-            clearNumericFilters();
-            
-            applyFilters();
-        }
-
-        function highlightSearch() {
-            const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
-            if (!searchTerm) return;
-            
-            const tableBody = document.getElementById('tableBody');
-            const rows = tableBody.querySelectorAll('tr');
-            
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                cells.forEach(cell => {
-                    const originalContent = cell.textContent;
-                    const lowerContent = originalContent.toLowerCase();
-                    
-                    if (lowerContent.includes(searchTerm)) {
-                        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
-                        cell.innerHTML = originalContent.replace(
-                            regex, 
-                            '<mark class="highlight">$1</mark>'
-                        );
-                    } else {
-                        cell.textContent = originalContent;
-                    }
-                });
-            });
-        }
-
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-
-        function renderDuplicatesTable(selectedCol) {
-            const container = document.getElementById('duplicatesTableDiv');
-            let html = '';
-            
-            if (selectedCol === '_ALL_') {
-                let hasDuplicates = false;
-                
-                for (const col of columns) {
-                    if (allDuplicates[col] && allDuplicates[col].length > 0) {
-                        hasDuplicates = true;
-                        html += `<h6>${col}</h6>`;
-                        html += `<div class="table-responsive mb-3"><table class="table table-bordered table-sm table-striped"><thead><tr><th>Valor</th><th>Ocorrências</th></tr></thead><tbody>`;
-                        
-                        allDuplicates[col].forEach(([value, count]) => {
-                            html += `<tr><td>${value}</td><td>${count}</td></tr>`;
-                        });
-                        
-                        html += `</tbody></table></div>`;
-                    }
-                }
-                
-                if (!hasDuplicates) {
-                    html = '<div class="alert alert-success py-2">Nenhum valor duplicado encontrado</div>';
+            let statusBadge = '';
+            if (isCompleted) {
+                statusBadge = `<div class="status-badge status-completed">SORTEADA</div>`;
+                if (raffle.winnerName) {
+                    statusBadge += `<div class="winner-badge"><i class="fas fa-crown"></i> VENCEDOR</div>`;
                 }
             } else {
-                if (allDuplicates[selectedCol] && allDuplicates[selectedCol].length > 0) {
-                    html += `<div class="table-responsive"><table class="table table-bordered table-sm table-striped"><thead><tr><th>Valor</th><th>Ocorrências</th></tr></thead><tbody>`;
-                    
-                    allDuplicates[selectedCol].forEach(([value, count]) => {
-                        html += `<tr><td>${value}</td><td>${count}</td></tr>`;
-                    });
-                    
-                    html += `</tbody></table></div>`;
-                } else {
-                    html = `<div class="alert alert-success py-2">Nenhum valor duplicado encontrado na coluna ${selectedCol}</div>`;
-                }
+                statusBadge = `<div class="status-badge status-active">ATIVA</div>`;
             }
             
-            container.innerHTML = html;
-        }
-
-        function generatePivotTable() {
-            const rowField = document.getElementById('pivotRowSelect').value;
-            const colField = document.getElementById('pivotColSelect').value || null;
-            const valueField = document.getElementById('pivotValueSelect').value;
-            const aggFunc = document.getElementById('pivotAggSelect').value;
+            const premiumWinners = raffle.premiumWinners || {};
+            const hasPremiumWinners = Object.keys(premiumWinners).length > 0;
             
-            if (!rowField || !valueField) {
-                alert('Selecione pelo menos uma coluna para Linhas e Valores.');
-                return;
-            }
-            
-            try {
-                // Criar estrutura para pivot
-                const pivotData = {};
-                
-                allData.forEach(row => {
-                    const rowKey = row[rowField] !== undefined ? String(row[rowField]) : '';
-                    const colKey = colField && row[colField] !== undefined ? String(row[colField]) : '';
-                    const value = parseFloat(row[valueField]) || 0;
-                    
-                    if (!pivotData[rowKey]) {
-                        pivotData[rowKey] = {};
+            card.innerHTML = `
+                <div class="raffle-image">
+                    ${raffle.image ? 
+                        `<img src="${raffle.image}" alt="${raffle.title}" 
+                            onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#d1d8e0;\'><i class=\'fas fa-gift fa-3x\'></i></div>'">` : 
+                        `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#d1d8e0;"><i class="fas fa-gift fa-3x"></i></div>`
                     }
-                    
-                    if (colField && !pivotData[rowKey][colKey]) {
-                        pivotData[rowKey][colKey] = {
-                            values: [],
-                            count: 0,
-                            sum: 0,
-                            min: Infinity,
-                            max: -Infinity
-                        };
-                    } else if (!colField && !pivotData[rowKey].total) {
-                        pivotData[rowKey].total = {
-                            values: [],
-                            count: 0,
-                            sum: 0,
-                            min: Infinity,
-                            max: -Infinity
-                        };
-                    }
-                    
-                    const cell = colField ? 
-                        pivotData[rowKey][colKey] : 
-                        pivotData[rowKey].total;
-                        
-                    cell.values.push(value);
-                    cell.count++;
-                    cell.sum += value;
-                    cell.min = Math.min(cell.min, value);
-                    cell.max = Math.max(cell.max, value);
-                });
-                
-                // Calcular valores agregados
-                const pivotRows = Object.keys(pivotData).sort();
-                const pivotCols = colField ? 
-                    Array.from(new Set(allData.map(row => row[colField]).filter(v => v !== undefined))).sort() : 
-                    ['Total'];
-                
-                // Gerar cabeçalho da tabela
-                const pivotHeader = document.getElementById('pivotHeader');
-                pivotHeader.innerHTML = '';
-                
-                const headerRow = document.createElement('tr');
-                const emptyHeader = document.createElement('th');
-                emptyHeader.textContent = `${rowField} \\ ${colField || ''}`;
-                headerRow.appendChild(emptyHeader);
-                
-                pivotCols.forEach(col => {
-                    const th = document.createElement('th');
-                    th.textContent = col;
-                    headerRow.appendChild(th);
-                });
-                pivotHeader.appendChild(headerRow);
-                
-                // Gerar corpo da tabela
-                const pivotBody = document.getElementById('pivotBody');
-                pivotBody.innerHTML = '';
-                
-                pivotRows.forEach(rowKey => {
-                    const tr = document.createElement('tr');
-                    const rowHeader = document.createElement('th');
-                    rowHeader.textContent = rowKey;
-                    tr.appendChild(rowHeader);
-                    
-                    pivotCols.forEach(col => {
-                        const cellData = pivotData[rowKey][col] || pivotData[rowKey].total;
-                        if (!cellData) {
-                            tr.appendChild(document.createElement('td'));
-                            return;
-                        }
-                        
-                        const td = document.createElement('td');
-                        let result;
-                        
-                        switch (aggFunc) {
-                            case 'sum': result = cellData.sum; break;
-                            case 'mean': result = cellData.sum / cellData.count; break;
-                            case 'count': result = cellData.count; break;
-                            case 'max': result = cellData.max; break;
-                            case 'min': result = cellData.min; break;
-                            default: result = cellData.sum;
-                        }
-                        
-                        // Formatar números
-                        if (typeof result === 'number') {
-                            td.textContent = Number.isInteger(result) ? 
-                                result : 
-                                result.toFixed(2);
-                        } else {
-                            td.textContent = result;
-                        }
-                        
-                        tr.appendChild(td);
-                    });
-                    
-                    pivotBody.appendChild(tr);
-                });
-                
-            } catch (error) {
-                console.error('Erro ao gerar tabela dinâmica:', error);
-                alert('Ocorreu um erro ao gerar a tabela dinâmica. Verifique o console para detalhes.');
-            }
-        }
-
-        // Função para gerar ícone baseado no tipo de dado
-        function getIconForDataType(dataType) {
-            switch(dataType) {
-                case 'Numérico': return '<i class="fas fa-calculator"></i>';
-                case 'Data': return '<i class="fas fa-calendar-alt"></i>';
-                case 'Moeda': return '<i class="fas fa-money-bill-wave"></i>';
-                default: return '<i class="fas fa-font"></i>';
-            }
-        }
-
-        // Função refinada para detectar tipo de dado
-        function detectDataType(value) {
-            if (value === null || value === undefined) return 'Texto';
-            
-            // 1. Verificar se é número (tipo primitivo)
-            if (typeof value === 'number') return 'Numérico';
-            
-            // 2. Verificar se é data (objeto Date)
-            if (value instanceof Date) return 'Data';
-            
-            // Converter para string para análises subsequentes
-            const strValue = String(value).trim();
-            
-            // 3. Verificar se é data (formato ISO)
-            if (!isNaN(Date.parse(strValue)) && strValue.includes('-')) {
-                return 'Data';
-            }
-            
-            // 4. Verificar se é moeda (mais preciso)
-            const currencyPatterns = [
-                /^[R$]\s?\d{1,3}(\.\d{3})*,\d{2}$/, // R$ 1.000,00
-                /^\d{1,3}(\.\d{3})*,\d{2}\s?[R$]?$/, // 1.000,00 R$
-                /^USD\s?\d{1,3}(,\d{3})*\.\d{2}$/, // USD 1,000.00
-                /^\d{1,3}(,\d{3})*\.\d{2}\s?USD$/ // 1,000.00 USD
-            ];
-            
-            for (const regex of currencyPatterns) {
-                if (regex.test(strValue)) {
-                    return 'Moeda';
-                }
-            }
-            
-            // 5. Verificar se é número em string
-            if (!isNaN(parseFloat(strValue)) && isFinite(strValue)) {
-                return 'Numérico';
-            }
-            
-            // 6. Verificar se é data (formatos comuns)
-            const dateFormats = [
-                /^\d{2}\/\d{2}\/\d{4}$/, // DD/MM/YYYY
-                /^\d{4}-\d{2}-\d{2}$/,    // YYYY-MM-DD
-                /^\d{2}-\d{2}-\d{4}$/     // DD-MM-YYYY
-            ];
-            
-            for (const regex of dateFormats) {
-                if (regex.test(strValue)) {
-                    return 'Data';
-                }
-            }
-            
-            // 7. Padrão é texto
-            return 'Texto';
-        }
-
-        // Função para gerar as barras de distribuição
-        function generateDistributionBars(data, isNumeric) {
-            if (data.length === 0) return '<div class="text-center py-4">Sem dados para exibir</div>';
-            
-            let barsHtml = '';
-            const maxBars = 20;
-            
-            if (isNumeric) {
-                // Converter para números e filtrar valores inválidos
-                const numericData = data.map(v => parseFloat(v)).filter(v => !isNaN(v));
-                if (numericData.length === 0) return '<div class="text-center py-4">Dados numéricos inválidos</div>';
-                
-                const min = Math.min(...numericData);
-                const max = Math.max(...numericData);
-                const range = max - min;
-                
-                if (range === 0) return '<div class="text-center py-4">Todos os valores são iguais</div>';
-                
-                const binSize = range / maxBars;
-                const bins = Array(maxBars).fill(0);
-                
-                numericData.forEach(value => {
-                    const binIndex = Math.min(Math.floor((value - min) / binSize), maxBars - 1);
-                    bins[binIndex]++;
-                });
-                
-                const maxCount = Math.max(...bins);
-                
-                bins.forEach((count, i) => {
-                    if (count > 0) {
-                        const height = Math.max(5, (count / maxCount) * 100);
-                        const barWidth = 100 / maxBars - 0.5;
-                        barsHtml += `
-                            <div class="distribution-bar" 
-                                 style="height: ${height}%; width: ${barWidth}%;"
-                                 title="${(min + i * binSize).toFixed(2)} - ${(min + (i+1) * binSize).toFixed(2)}: ${count} valores">
-                            </div>
-                        `;
-                    }
-                });
-            } else {
-                // Distribuição para dados não numéricos
-                const frequencyMap = {};
-                data.forEach(val => {
-                    const strVal = String(val);
-                    frequencyMap[strVal] = (frequencyMap[strVal] || 0) + 1;
-                });
-                
-                const sorted = Object.entries(frequencyMap)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, maxBars);
-                
-                if (sorted.length === 0) return '<div class="text-center py-4">Sem dados para exibir</div>';
-                
-                const maxCount = sorted[0][1];
-                
-                sorted.forEach(([value, count]) => {
-                    const height = Math.max(5, (count / maxCount) * 100);
-                    const barWidth = 100 / sorted.length - 0.5;
-                    barsHtml += `
-                        <div class="distribution-bar" 
-                             style="height: ${height}%; width: ${barWidth}%;"
-                             title="${value}: ${count} ocorrências">
-                        </div>
-                    `;
-                });
-            }
-            
-            return barsHtml || '<div class="text-center w-100 py-4">Dados insuficientes para exibir gráfico</div>';
-        }
-
-        function generateStats() {
-            const container = document.getElementById('columnStatsAccordion');
-            container.innerHTML = '';
-            
-            // Atualizar cards de resumo
-            document.getElementById('statTotalRecords').textContent = allData.length;
-            document.getElementById('statFilteredRecords').textContent = filteredData.length;
-            document.getElementById('statTotalColumns').textContent = columns.length;
-            
-            // Calcular taxa de preenchimento
-            let totalCells = allData.length * columns.length;
-            let filledCells = 0;
-            
-            allData.forEach(row => {
-                columns.forEach(col => {
-                    if (row[col] !== undefined && row[col] !== null) {
-                        filledCells++;
-                    }
-                });
-            });
-            
-            const fillRate = totalCells > 0 ? Math.round((filledCells / totalCells) * 100) : 0;
-            document.getElementById('statFillRate').textContent = fillRate + '%';
-            
-            if (allData.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-4">
-                        <i class="fas fa-chart-pie" style="font-size: 3rem; color: #e0e0e0;"></i>
-                        <p class="mt-3 small">Carregue um arquivo para visualizar estatísticas</p>
+                    ${statusBadge}
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${progress}%"></div>
                     </div>
-                `;
-                return;
-            }
-            
-            // GERAR ACORDEÃO PARA TODAS AS COLUNAS
-            columns.forEach((col, index) => {
-                const colData = allData.map(row => row[col]).filter(val => val !== undefined && val !== null);
-                const nullCount = allData.length - colData.length;
-                const uniqueValues = [...new Set(colData.map(v => String(v)))];
-                const uniqueCount = uniqueValues.length;
-                
-                // Detectar tipo de dado com amostragem mais confiável
-                let dataType = 'Texto';
-                let isNumeric = false;
-                let isCurrency = false;
-                let isDate = false;
-                
-                if (colData.length > 0) {
-                    // Analisar múltiplos valores para determinar tipo predominante
-                    const typeCounts = {
-                        'Numérico': 0,
-                        'Moeda': 0,
-                        'Data': 0,
-                        'Texto': 0
-                    };
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">${raffle.title}</h3>
+                    <p class="card-description">${raffle.description}</p>
                     
-                    // Amostrar até 100 valores para classificação
-                    const sampleSize = Math.min(colData.length, 100);
-                    for (let i = 0; i < sampleSize; i++) {
-                        const type = detectDataType(colData[i]);
-                        typeCounts[type]++;
-                    }
-                    
-                    // Determinar tipo predominante
-                    let maxCount = 0;
-                    for (const [type, count] of Object.entries(typeCounts)) {
-                        if (count > maxCount) {
-                            dataType = type;
-                            maxCount = count;
-                        }
-                    }
-                    
-                    // Configurar flags
-                    isNumeric = dataType === 'Numérico';
-                    isCurrency = dataType === 'Moeda';
-                    isDate = dataType === 'Data';
-                }
-                
-                // Gerar estatísticas básicas para qualquer tipo de dado
-                let statsHtml = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-sm stats-table">
-                                <tr>
-                                    <td class="stat-label">Tipo de Dado:</td>
-                                    <td><span class="badge badge-${dataType.toLowerCase()}">${dataType}</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="stat-label">Valores não nulos:</td>
-                                    <td>${colData.length} (${Math.round((colData.length/allData.length)*100)}%)</td>
-                                </tr>
-                                <tr>
-                                    <td class="stat-label">Valores nulos:</td>
-                                    <td>${nullCount} (${Math.round((nullCount/allData.length)*100)}%)</td>
-                                </tr>
-                                <tr>
-                                    <td class="stat-label">Valores únicos:</td>
-                                    <td>${uniqueCount}</td>
-                                </tr>
-                                <tr>
-                                    <td class="stat-label">Taxa de Unicidade:</td>
-                                    <td>${Math.round((uniqueCount/colData.length)*100)}%</td>
-                                </tr>
-                            </table>
+                    <div class="raffle-info">
+                        <div class="info-item">
+                            <span class="info-label">Valor:</span>
+                            <span class="info-value">R$ ${raffle.price.toFixed(2)}</span>
                         </div>
-                `;
-                
-                // Adicionar estatísticas específicas por tipo
-                if (isNumeric || isCurrency) {
-                    const numericData = colData.map(v => parseFloat(v)).filter(v => !isNaN(v));
-                    
-                    if (numericData.length > 0) {
-                        const min = Math.min(...numericData);
-                        const max = Math.max(...numericData);
-                        const sum = numericData.reduce((a, b) => a + b, 0);
-                        const mean = sum / numericData.length;
-                        
-                        statsHtml += `
-                            <div class="col-md-6">
-                                <table class="table table-sm stats-table">
-                                    <tr>
-                                        <td class="stat-label">Mínimo:</td>
-                                        <td>${isCurrency ? 'R$ ' + min.toFixed(2) : min.toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="stat-label">Máximo:</td>
-                                        <td>${isCurrency ? 'R$ ' + max.toFixed(2) : max.toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="stat-label">Média:</td>
-                                        <td>${isCurrency ? 'R$ ' + mean.toFixed(2) : mean.toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="stat-label">Soma:</td>
-                                        <td>${isCurrency ? 'R$ ' + sum.toFixed(2) : sum.toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="stat-label">Intervalo:</td>
-                                        <td>${(max - min).toFixed(2)}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        `;
-                    }
-                } else {
-                    // Estatísticas para dados não numéricos
-                    const frequencyMap = {};
-                    colData.forEach(val => {
-                        const strVal = String(val);
-                        frequencyMap[strVal] = (frequencyMap[strVal] || 0) + 1;
-                    });
-                    
-                    // Top 5 valores
-                    const topValues = Object.entries(frequencyMap)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 5);
-                    
-                    statsHtml += `
-                        <div class="col-md-6">
-                            <h6>Valores Mais Frequentes:</h6>
-                            <table class="table table-sm stats-table">
-                                <thead>
-                                    <tr>
-                                        <th>Valor</th>
-                                        <th>Frequência</th>
-                                        <th>%</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${topValues.map(([value, count]) => `
-                                        <tr>
-                                            <td>${value}</td>
-                                            <td>${count}</td>
-                                            <td>${Math.round((count/colData.length)*100)}%</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                        <div class="info-item">
+                            <span class="info-label">Vendidas:</span>
+                            <span class="info-value">${soldNumbers}/${raffle.totalNumbers}</span>
                         </div>
-                    `;
-                }
-                
-                statsHtml += `</div>`; // Fechar a row
-                
-                // Adicionar visualização de distribuição para todos os tipos
-                statsHtml += `
-                    <div class="mt-4">
-                        <h6>Distribuição de Valores</h6>
-                        <div class="distribution-chart bg-light p-2 rounded">
-                            <div class="d-flex h-100 align-items-end" style="height: 120px;">
-                                ${generateDistributionBars(colData, isNumeric || isCurrency)}
-                            </div>
+                        <div class="info-item">
+                            <span class="info-label">Reservas:</span>
+                            <span class="info-value">${pendingNumbers}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prêmio instantâneo:</span>
+                            <span class="info-value">${raffle.premiumNumbers && raffle.premiumNumbers.length > 0 ? 'Sim' : 'Não'}</span>
                         </div>
                     </div>
-                `;
-                
-                // Classes para badges
-                const badgeClass = {
-                    'Numérico': 'badge-numeric',
-                    'Moeda': 'badge-currency',
-                    'Data': 'badge-date',
-                    'Texto': 'badge-text'
-                }[dataType] || 'badge-secondary';
-                
-                // Gerar acordeão para a coluna
-                const accordionItem = `
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading${index}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                                    data-bs-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
-                                <div class="d-flex align-items-center w-100">
-                                    <span class="accordion-icon">
-                                        ${getIconForDataType(dataType)}
-                                    </span>
-                                    <div class="flex-grow-1">
-                                        ${col}
-                                        <span class="badge ${badgeClass}">${dataType}</span>
+                    
+                    ${!isCompleted ? `
+                        <div class="selection-controls">
+                            <div class="quantity-selector">
+                                <button class="qty-btn" id="decrease-qty-${raffle.id}">-</button>
+                                <input type="number" class="qty-input" id="qty-input-${raffle.id}" value="1" min="1" max="${raffle.totalNumbers - totalSold}">
+                                <button class="qty-btn" id="increase-qty-${raffle.id}">+</button>
+                            </div>
+                            <button class="btn-select-random" id="random-select-${raffle.id}">
+                                <i class="fas fa-random"></i> Aleatório
+                            </button>
+                        </div>
+                        
+                        <div class="numbers-grid" id="numbers-grid-${raffle.id}">
+                            ${Array.from({length: raffle.totalNumbers}, (_, i) => {
+                                const number = i + 1;
+                                const purchase = raffle.purchases && raffle.purchases[number];
+                                let className = 'number-item ';
+                                let title = 'Cota disponível';
+                                
+                                if (purchase) {
+                                    if (purchase.status === 'confirmed') {
+                                        className += 'number-purchased';
+                                        title = 'Cota vendida';
+                                    } else if (purchase.status === 'pending') {
+                                        className += 'number-pending';
+                                        title = 'Cota reservada';
+                                    } else if (purchase.status === 'cancelled') {
+                                        className += 'number-cancelled';
+                                        title = 'Cota cancelada';
+                                    }
+                                } else {
+                                    className += 'number-available';
+                                }
+                                
+                                // REMOVIDO: Não mostrar indicação de cota premiada antes da compra
+                                // Apenas admins podem ver durante o desenvolvimento/teste
+                                if (raffle.premiumNumbers && raffle.premiumNumbers.includes(number)) {
+                                    if (userIsAdmin) {
+                                        className += ' number-premium';
+                                        title += ' - Cota premiada (somente admin vê)';
+                                    }
+                                    // Usuários normais não veem nenhuma indicação
+                                }
+                                
+                                return `
+                                    <div class="${className}" data-number="${number}" 
+                                         title="${title}">
+                                        ${number}
                                     </div>
-                                    <div class="text-muted small me-2">
-                                        ${uniqueCount} valores únicos
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <button class="btn-purchase" id="btn-purchase-${raffle.id}" ${totalSold === raffle.totalNumbers ? 'disabled' : ''}>
+                            <i class="fas fa-shopping-cart"></i> Reservar Cotas
+                        </button>
+                    ` : ''}
+                    
+                    ${raffle.status === 'completed' ? `
+                        ${raffle.winningNumber ? `
+                            <div class="winner-details">
+                                <h4><i class="fas fa-crown"></i> SORTEIO REALIZADO</h4>
+                                <p><strong>Número sorteado:</strong> ${raffle.winningNumber}</p>
+                                ${raffle.winnerName ? 
+                                    `<p><strong>Vencedor:</strong> ${raffle.winnerName}</p>` : 
+                                    `<p><strong>Vencedor:</strong> A ser anunciado</p>`
+                                }
+                            </div>
+                        ` : ''}
+                    ` : ''}
+                    
+                    ${hasPremiumWinners ? `
+                        <div class="premium-winners">
+                            <h4><i class="fas fa-gift"></i> Vencedores de Cotas Premiadas</h4>
+                            ${Object.entries(premiumWinners).map(([number, winner]) => `
+                                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(155,89,182,0.2);">
+                                    <div>
+                                        <strong>Cota ${number}</strong>: ${winner.userName}
                                     </div>
                                 </div>
-                            </button>
-                        </h2>
-                        <div id="collapse${index}" class="accordion-collapse collapse" 
-                             aria-labelledby="heading${index}" data-bs-parent="#columnStatsAccordion">
-                            <div class="accordion-body">
-                                ${statsHtml}
-                            </div>
+                            `).join('')}
                         </div>
-                    </div>
-                `;
+                    ` : ''}
+                    
+                    ${soldNumbers === raffle.totalNumbers && !isCompleted && userIsAdmin ? `
+                        <div class="raffle-admin-buttons">
+                            <button class="btn-set-winner" data-id="${raffle.id}">
+                                <i class="fas fa-trophy"></i> Definir Vencedor
+                            </button>
+                            <button class="btn-auto-draw" data-id="${raffle.id}">
+                                <i class="fas fa-random"></i> Sortear Auto
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${soldNumbers === raffle.totalNumbers && !isCompleted ? `
+                        <div class="winner-section">
+                            <h4><i class="fas fa-trophy"></i> Todas as Cotas Vendidas!</h4>
+                            <p>Sorteio em breve através de site sorteador oficial.</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            rafflesContainer.appendChild(card);
+            
+            if (!isCompleted) {
+                setupRaffleInteractions(raffle);
+            }
+            
+            if (soldNumbers === raffle.totalNumbers && !isCompleted && userIsAdmin) {
+                const setWinnerBtn = card.querySelector(`.btn-set-winner`);
+                const autoDrawBtn = card.querySelector(`.btn-auto-draw`);
                 
-                container.innerHTML += accordionItem;
-            });
-            
-            // Adicionar funcionalidade aos botões de expandir/recolher
-            document.getElementById('expandAllStats').addEventListener('click', function() {
-                const collapses = document.querySelectorAll('#columnStatsAccordion .accordion-collapse');
-                collapses.forEach(collapse => {
-                    new bootstrap.Collapse(collapse, { show: true });
-                });
-            });
-
-            document.getElementById('collapseAllStats').addEventListener('click', function() {
-                const collapses = document.querySelectorAll('#columnStatsAccordion .accordion-collapse.show');
-                collapses.forEach(collapse => {
-                    new bootstrap.Collapse(collapse, { hide: true });
-                });
-            });
-        }
-
-        // Funções de exportação
-        function exportToCsv() {
-            if (filteredData.length === 0) {
-                alert('Não há dados para exportar');
-                return;
-            }
-            
-            const csv = Papa.unparse(filteredData);
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            saveAs(blob, `dados_filtrados_${new Date().toISOString().slice(0,10)}.csv`);
-        }
-
-        function exportToExcel() {
-            if (filteredData.length === 0) {
-                alert('Não há dados para exportar');
-                return;
-            }
-            
-            const worksheet = XLSX.utils.json_to_sheet(filteredData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Dados Filtrados");
-            XLSX.writeFile(workbook, `dados_filtrados_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-
-        function exportPivotToCsv() {
-            const pivotTable = document.getElementById('pivotTable');
-            if (!pivotTable || pivotTable.rows.length < 2) {
-                alert('Gere uma tabela dinâmica primeiro');
-                return;
-            }
-            
-            let csv = '';
-            for (let i = 0; i < pivotTable.rows.length; i++) {
-                const row = pivotTable.rows[i];
-                let rowData = [];
-                for (let j = 0; j < row.cells.length; j++) {
-                    rowData.push(`"${row.cells[j].textContent}"`);
+                if (setWinnerBtn) {
+                    setWinnerBtn.addEventListener('click', () => {
+                        raffleIdSelect.value = raffle.id;
+                        fillAdminForm();
+                        adminPanel.style.display = 'block';
+                        winnerInputSection.style.display = 'block';
+                        winnerNumberInput.max = raffle.totalNumbers;
+                        winnerNumberInput.min = 1;
+                        winnerNumberInput.value = '';
+                    });
                 }
-                csv += rowData.join(',') + '\n';
-            }
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            saveAs(blob, `tabela_dinamica_${new Date().toISOString().slice(0,10)}.csv`);
-        }
-
-        function exportPivotToExcel() {
-            const pivotTable = document.getElementById('pivotTable');
-            if (!pivotTable || pivotTable.rows.length < 2) {
-                alert('Gere uma tabela dinâmica primeiro');
-                return;
-            }
-            
-            const data = [];
-            for (let i = 0; i < pivotTable.rows.length; i++) {
-                const row = pivotTable.rows[i];
-                let rowData = [];
-                for (let j = 0; j < row.cells.length; j++) {
-                    rowData.push(row.cells[j].textContent);
-                }
-                data.push(rowData);
-            }
-            
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Tabela Dinâmica");
-            XLSX.writeFile(workbook, `tabela_dinamica_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-
-        function exportDuplicates() {
-            const selectedCol = document.getElementById('dupColSelect').value;
-            let dataToExport = [];
-            
-            if (selectedCol === '_ALL_') {
-                for (const col of columns) {
-                    if (allDuplicates[col]) {
-                        allDuplicates[col].forEach(([value, count]) => {
-                            dataToExport.push({
-                                Coluna: col,
-                                Valor: value,
-                                Ocorrências: count
-                            });
-                        });
-                    }
-                }
-            } else {
-                if (allDuplicates[selectedCol]) {
-                    allDuplicates[selectedCol].forEach(([value, count]) => {
-                        dataToExport.push({
-                            Coluna: selectedCol,
-                            Valor: value,
-                            Ocorrências: count
-                        });
+                
+                if (autoDrawBtn) {
+                    autoDrawBtn.addEventListener('click', () => {
+                        if (confirm(`Sortear vencedor para "${raffle.title}"?`)) {
+                            performAutoDraw(raffle.id);
+                        }
                     });
                 }
             }
+        });
+        
+        updateStatusBar();
+    }
+
+    function setupRaffleInteractions(raffle) {
+        const raffleId = raffle.id;
+        const numbersGrid = document.getElementById(`numbers-grid-${raffleId}`);
+        const purchaseBtn = document.getElementById(`btn-purchase-${raffleId}`);
+        const randomBtn = document.getElementById(`random-select-${raffleId}`);
+        const qtyInput = document.getElementById(`qty-input-${raffleId}`);
+        const decreaseBtn = document.getElementById(`decrease-qty-${raffleId}`);
+        const increaseBtn = document.getElementById(`increase-qty-${raffleId}`);
+        
+        let localSelectedNumbers = [];
+        
+        numbersGrid.addEventListener('click', (e) => {
+            const numberItem = e.target.closest('.number-item');
+            if (!numberItem) return;
             
-            if (dataToExport.length === 0) {
-                alert('Não há dados duplicados para exportar');
+            if (numberItem.classList.contains('number-purchased') || 
+                numberItem.classList.contains('number-pending') ||
+                numberItem.classList.contains('number-cancelled')) {
+                showToast('Cota não disponível', 'error');
                 return;
             }
             
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Duplicados");
-            XLSX.writeFile(workbook, `duplicados_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            updateFreezeSettings();
-            updatePivotFreezeSettings();
+            const number = parseInt(numberItem.dataset.number);
+            
+            if (numberItem.classList.contains('number-selected')) {
+                numberItem.classList.remove('number-selected');
+                localSelectedNumbers = localSelectedNumbers.filter(n => n !== number);
+            } else {
+                numberItem.classList.add('number-selected');
+                localSelectedNumbers.push(number);
+            }
+            
+            purchaseBtn.disabled = localSelectedNumbers.length === 0;
+            selectedNumbers = localSelectedNumbers;
         });
-    </script>
+        
+        decreaseBtn.addEventListener('click', () => {
+            let value = parseInt(qtyInput.value);
+            if (value > 1) {
+                qtyInput.value = value - 1;
+            }
+        });
+        
+        increaseBtn.addEventListener('click', () => {
+            let value = parseInt(qtyInput.value);
+            const totalSold = raffle.purchases ? Object.keys(raffle.purchases).length : 0;
+            const available = raffle.totalNumbers - totalSold;
+            if (value < available) {
+                qtyInput.value = value + 1;
+            }
+        });
+        
+        qtyInput.addEventListener('change', () => {
+            let value = parseInt(qtyInput.value);
+            const totalSold = raffle.purchases ? Object.keys(raffle.purchases).length : 0;
+            const available = raffle.totalNumbers - totalSold;
+            
+            if (value < 1) qtyInput.value = 1;
+            if (value > available) qtyInput.value = available;
+        });
+        
+        randomBtn.addEventListener('click', () => {
+            const totalSold = raffle.purchases ? Object.keys(raffle.purchases).length : 0;
+            const available = raffle.totalNumbers - totalSold;
+            const qty = parseInt(qtyInput.value);
+            
+            if (qty > available) {
+                showToast(`Apenas ${available} disponíveis`, 'error');
+                return;
+            }
+            
+            if (qty < 1) {
+                showToast(`Selecione pelo menos 1 cota`, 'error');
+                return;
+            }
+            
+            const allNumbers = Array.from({length: raffle.totalNumbers}, (_, i) => i + 1);
+            const purchasedNumbers = raffle.purchases ? Object.keys(raffle.purchases).map(Number) : [];
+            const availableNumbers = allNumbers.filter(n => !purchasedNumbers.includes(n));
+            
+            const shuffled = [...availableNumbers].sort(() => 0.5 - Math.random());
+            const randomNumbers = shuffled.slice(0, qty);
+            
+            const allNumberItems = numbersGrid.querySelectorAll('.number-item');
+            allNumberItems.forEach(item => {
+                item.classList.remove('number-selected');
+            });
+            
+            localSelectedNumbers = [];
+            randomNumbers.forEach(number => {
+                const item = numbersGrid.querySelector(`[data-number="${number}"]`);
+                if (item && !item.classList.contains('number-purchased') && 
+                    !item.classList.contains('number-pending') &&
+                    !item.classList.contains('number-cancelled')) {
+                    item.classList.add('number-selected');
+                    localSelectedNumbers.push(number);
+                }
+            });
+            
+            purchaseBtn.disabled = localSelectedNumbers.length === 0;
+            selectedNumbers = localSelectedNumbers;
+        });
+        
+        purchaseBtn.addEventListener('click', () => {
+            if (localSelectedNumbers.length === 0) {
+                showToast('Selecione ao menos uma cota', 'error');
+                return;
+            }
+            
+            const purchasedNumbers = raffle.purchases ? Object.keys(raffle.purchases).map(Number) : [];
+            const unavailableNumbers = localSelectedNumbers.filter(n => purchasedNumbers.includes(n));
+            
+            if (unavailableNumbers.length > 0) {
+                showToast(`Cotas já reservadas: ${unavailableNumbers.join(', ')}`, 'error');
+                return;
+            }
+            
+            processReservation(raffle, localSelectedNumbers);
+        });
+    }
+
+    function processReservation(raffle, numbers) {
+        if (isProcessingReservation) {
+            showToast('Processando reserva anterior...', 'info');
+            return;
+        }
+        
+        if (!userToken) {
+            showToast('Configure um token primeiro', 'error');
+            tokenSetupModal.style.display = 'flex';
+            return;
+        }
+        
+        if (numbers.length === 0) {
+            showToast('Selecione pelo menos uma cota', 'error');
+            return;
+        }
+        
+        isProcessingReservation = true;
+        currentRaffle = raffle;
+        
+        const code = 'RIFA-' + raffle.id.substring(0, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        currentPurchaseCode = code;
+        
+        const total = raffle.price * numbers.length;
+        
+        purchaseTitle.textContent = raffle.title;
+        purchaseNumbers.textContent = numbers.join(', ');
+        purchaseQuantity.textContent = numbers.length;
+        purchasePrice.textContent = `R$ ${raffle.price.toFixed(2)}`;
+        purchaseTotal.textContent = `R$ ${total.toFixed(2)}`;
+        purchaseCode.textContent = code;
+        
+        const message = encodeURIComponent(
+            `Olá! Reserva na rifa "${raffle.title}".\n` +
+            `Código: ${code}\n` +
+            `Cotas: ${numbers.join(', ')}\n` +
+            `Total: R$ ${total.toFixed(2)}\n` +
+            `Comprovante de pagamento:`
+        );
+        
+        const formattedNumber = whatsappNumber.replace(/\D/g, '');
+        btnWhatsapp.onclick = () => {
+            window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
+        };
+        
+        purchaseModal.style.display = 'flex';
+        
+        const reservationData = {
+            code: code,
+            raffleId: raffle.id,
+            userId: userToken,
+            userName: userName,
+            numbers: numbers,
+            total: total,
+            status: 'pending',
+            reservedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        };
+        
+        db.collection("purchases").add(reservationData)
+        .then((docRef) => {
+            const updates = {};
+            numbers.forEach(number => {
+                updates[`purchases.${number}`] = {
+                    purchaseId: docRef.id,
+                    userId: userToken,
+                    userName: userName,
+                    code: code,
+                    status: 'pending',
+                    reservedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+            });
+            
+            return db.collection("raffles").doc(raffle.id).update(updates);
+        })
+        .then(() => {
+            showToast('Reserva realizada! Envie o comprovante.', 'success');
+            
+            // Verificação interna (não revelada ao usuário)
+            const premiumNumbersInSelection = numbers.filter(n => 
+                raffle.premiumNumbers && raffle.premiumNumbers.includes(n)
+            );
+            
+            if (premiumNumbersInSelection.length > 0) {
+                console.log(`Usuário reservou ${premiumNumbersInSelection.length} cota(s) premiada(s) (somente admin vê):`, premiumNumbersInSelection);
+            }
+            
+            isProcessingReservation = false;
+        })
+        .catch(error => {
+            console.error("Erro ao registrar reserva:", error);
+            showToast('Erro ao registrar reserva', 'error');
+            isProcessingReservation = false;
+        });
+    }
+
+    function updateStatusBar() {
+        const active = raffles.filter(r => r.status !== 'completed').length;
+        const completed = raffles.filter(r => r.status === 'completed').length;
+        
+        let text = '';
+        switch(currentFilter) {
+            case 'all': text = `${raffles.length} rifas (${active} ativas, ${completed} sorteadas)`; break;
+            case 'active': text = `${active} rifas ativas`; break;
+            case 'completed': text = `${completed} rifas sorteadas`; break;
+        }
+        
+        statusText.textContent = text;
+    }
+
+    function showToast(message, type) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function makeAdmin() {
+        const user = auth.currentUser;
+        if (!user) {
+            loginModal.style.display = 'flex';
+            return;
+        }
+        
+        db.collection("admins").doc(user.uid).set({
+            email: user.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            userIsAdmin = true;
+            localStorage.setItem('userIsAdmin', 'true');
+            adminInfo.style.display = 'block';
+            reservationsPanel.style.display = 'block';
+            adminPanel.style.display = 'block';
+            showToast('Agora você é administrador!', 'success');
+            loadPendingReservations();
+        })
+        .catch(error => {
+            console.error("Erro ao tornar admin:", error);
+            showToast('Erro ao conceder acesso', 'error');
+        });
+    }
+
+    function toggleAdminPanel() {
+        const user = auth.currentUser;
+        
+        if (!user) {
+            loginModal.style.display = 'flex';
+            showToast('Faça login como administrador', 'info');
+            return;
+        }
+        
+        checkAdminStatus(user.uid).then(isAdminUser => {
+            if (isAdminUser) {
+                adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+                if (adminPanel.style.display === 'block') {
+                    loadPendingReservations();
+                }
+            } else {
+                showToast('Você não tem permissões de administrador', 'error');
+            }
+        });
+    }
+    
+    function updateAdminRaffleSelect() {
+        raffleIdSelect.innerHTML = '<option value="new">Nova Rifa</option>';
+        
+        raffles.forEach(raffle => {
+            const option = document.createElement('option');
+            option.value = raffle.id;
+            option.textContent = `#${raffle.id.substring(0, 8)} - ${raffle.title}`;
+            raffleIdSelect.appendChild(option);
+        });
+    }
+    
+    function fillAdminForm() {
+        const raffleId = raffleIdSelect.value;
+        
+        if (raffleId === 'new') {
+            resetAdminForm();
+            return;
+        }
+        
+        const raffle = raffles.find(r => r.id === raffleId);
+        if (raffle) {
+            document.getElementById('raffle-title').value = raffle.title || '';
+            document.getElementById('raffle-description').value = raffle.description || '';
+            document.getElementById('raffle-price').value = raffle.price || '';
+            document.getElementById('total-numbers').value = raffle.totalNumbers || '';
+            document.getElementById('raffle-image').value = raffle.image || '';
+            
+            premiumNumbers = raffle.premiumNumbers || [];
+            updatePremiumNumbersList();
+            
+            const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
+            const isCompleted = raffle.status === 'completed';
+            
+            if (soldNumbers === raffle.totalNumbers && !isCompleted) {
+                winnerInputSection.style.display = 'block';
+                winnerNumberInput.max = raffle.totalNumbers;
+                winnerNumberInput.min = 1;
+                winnerNumberInput.value = '';
+            } else {
+                winnerInputSection.style.display = 'none';
+            }
+        }
+    }
+    
+    function resetAdminForm() {
+        raffleIdSelect.value = 'new';
+        document.getElementById('raffle-title').value = '';
+        document.getElementById('raffle-description').value = '';
+        document.getElementById('raffle-price').value = '';
+        document.getElementById('total-numbers').value = '100';
+        document.getElementById('raffle-image').value = '';
+        premiumNumbers = [];
+        updatePremiumNumbersList();
+        winnerInputSection.style.display = 'none';
+    }
+    
+    function addPremiumNumber() {
+        const number = parseInt(premiumNumberInput.value);
+        const totalNumbers = parseInt(totalNumbersInput.value) || 100;
+        
+        if (isNaN(number) || number < 1 || number > totalNumbers) {
+            showToast(`Número deve ser entre 1 e ${totalNumbers}`, 'error');
+            return;
+        }
+        
+        if (premiumNumbers.includes(number)) {
+            showToast('Número já na lista', 'error');
+            return;
+        }
+        
+        premiumNumbers.push(number);
+        premiumNumberInput.value = '';
+        updatePremiumNumbersList();
+    }
+    
+    function updatePremiumNumbersList() {
+        premiumNumbersList.innerHTML = '';
+        premiumNumbers.sort((a, b) => a - b).forEach(number => {
+            const tag = document.createElement('span');
+            tag.className = 'premium-number-tag';
+            tag.innerHTML = `
+                ${number}
+                <button class="remove-premium" data-number="${number}" style="background:none;border:none;color:white;cursor:pointer;">&times;</button>
+            `;
+            premiumNumbersList.appendChild(tag);
+        });
+        
+        premiumNumbersList.querySelectorAll('.remove-premium').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const number = parseInt(e.target.dataset.number);
+                premiumNumbers = premiumNumbers.filter(n => n !== number);
+                updatePremiumNumbersList();
+            });
+        });
+    }
+    
+    function saveRaffle() {
+        if (!userIsAdmin) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        const id = raffleIdSelect.value;
+        const title = document.getElementById('raffle-title').value;
+        const description = document.getElementById('raffle-description').value;
+        const price = parseFloat(document.getElementById('raffle-price').value);
+        const totalNumbers = parseInt(document.getElementById('total-numbers').value);
+        const image = document.getElementById('raffle-image').value;
+        
+        if (!title || !description || !price || !totalNumbers) {
+            showToast('Preencha todos os campos obrigatórios', 'error');
+            return;
+        }
+        
+        if (price <= 0) {
+            showToast('Valor deve ser maior que zero', 'error');
+            return;
+        }
+        
+        if (totalNumbers < 1) {
+            showToast('Total de cotas deve ser pelo menos 1', 'error');
+            return;
+        }
+        
+        premiumNumbers = premiumNumbers.filter(n => n >= 1 && n <= totalNumbers);
+        
+        const raffleData = {
+            title,
+            description,
+            price,
+            totalNumbers,
+            premiumNumbers,
+            image,
+            status: 'active',
+            purchases: {},
+            premiumWinners: {},
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if (id === 'new') {
+            db.collection("raffles").add(raffleData)
+            .then(() => {
+                showToast('Rifa criada!', 'success');
+                resetAdminForm();
+                loadRaffles();
+            })
+            .catch(error => {
+                console.error("Erro ao criar rifa: ", error);
+                showToast('Erro ao criar rifa', 'error');
+            });
+        } else {
+            db.collection("raffles").doc(id).update({
+                title,
+                description,
+                price,
+                totalNumbers,
+                premiumNumbers,
+                image
+            })
+            .then(() => {
+                showToast('Rifa atualizada!', 'success');
+                resetAdminForm();
+                loadRaffles();
+            })
+            .catch(error => {
+                console.error("Erro ao atualizar rifa: ", error);
+                showToast('Erro ao atualizar rifa', 'error');
+            });
+        }
+    }
+    
+    function handleLogin() {
+        const email = adminEmailInput.value;
+        const password = adminPasswordInput.value;
+        
+        if (!email || !password) {
+            loginError.textContent = "Preencha todos os campos";
+            loginError.style.display = 'block';
+            return;
+        }
+        
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                
+                loginModal.style.display = 'none';
+                adminEmailInput.value = '';
+                adminPasswordInput.value = '';
+                loginError.style.display = 'none';
+                
+                showToast('Login realizado!', 'success');
+                
+                checkAdminStatus(user.uid).then(isAdminUser => {
+                    if (isAdminUser) {
+                        adminInfo.style.display = 'block';
+                        reservationsPanel.style.display = 'block';
+                        adminPanel.style.display = 'block';
+                        userIsAdmin = true;
+                        localStorage.setItem('userIsAdmin', 'true');
+                        loadPendingReservations();
+                    } else {
+                        showToast('Login realizado, mas não é admin', 'info');
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error("Erro de login: ", error);
+                
+                let errorMessage = "Erro ao fazer login";
+                
+                switch(error.code) {
+                    case "auth/invalid-email":
+                        errorMessage = "E-mail inválido";
+                        break;
+                    case "auth/user-not-found":
+                        errorMessage = "Usuário não encontrado";
+                        break;
+                    case "auth/wrong-password":
+                        errorMessage = "Senha incorreta";
+                        break;
+                }
+                
+                loginError.textContent = errorMessage;
+                loginError.style.display = 'block';
+            });
+    }
+    
+    function handleLogout() {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userIsAdmin');
+        
+        auth.signOut().then(() => {
+            showToast('Você saiu da conta', 'info');
+        });
+        
+        userInfo.style.display = 'none';
+        adminInfo.style.display = 'none';
+        adminPanel.style.display = 'none';
+        reservationsPanel.style.display = 'none';
+        winnerInputSection.style.display = 'none';
+        userIsAdmin = false;
+        
+        userToken = null;
+        userName = null;
+        currentAdminUserId = null;
+        
+        setTimeout(() => location.reload(), 1000);
+    }
+    
+    function showTokenModal() {
+        if (userToken) {
+            tokenDisplay.textContent = userToken;
+            tokenModal.style.display = 'flex';
+        } else {
+            tokenSetupModal.style.display = 'flex';
+        }
+    }
+    
+    function copyTokenToClipboard() {
+        navigator.clipboard.writeText(userToken)
+            .then(() => {
+                showToast('Token copiado!', 'success');
+            })
+            .catch(err => {
+                showToast('Erro ao copiar', 'error');
+            });
+    }
+    
+    function loadPendingReservations() {
+        if (!currentAdminUserId) {
+            reservationsList.innerHTML = '<p>Faça login como administrador</p>';
+            return;
+        }
+        
+        checkAdminStatus(currentAdminUserId).then(isAdmin => {
+            if (!isAdmin) {
+                reservationsList.innerHTML = '<p>Permissão negada</p>';
+                return;
+            }
+            
+            db.collection("purchases")
+                .where("status", "==", "pending")
+                .get()
+                .then((snapshot) => {
+                    reservationsList.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        reservationsList.innerHTML = '<p>Nenhuma reserva pendente</p>';
+                        return;
+                    }
+                    
+                    const reservationsArray = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        reservationsArray.push({
+                            id: doc.id,
+                            ...data,
+                            timestamp: data.reservedAt ? data.reservedAt.toDate().getTime() : 0
+                        });
+                    });
+                    
+                    reservationsArray.sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    reservationsArray.forEach(reservation => {
+                        const reservationItem = document.createElement('div');
+                        reservationItem.className = 'reservation-item';
+                        reservationItem.innerHTML = `
+                            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                <strong>${reservation.userName || 'Cliente'}</strong>
+                                <small>${formatTime(reservation.reservedAt ? reservation.reservedAt.toDate() : new Date())}</small>
+                            </div>
+                            <div><strong>Rifa ID:</strong> ${reservation.raffleId || 'N/A'}</div>
+                            <div><strong>Código:</strong> ${reservation.code || 'N/A'}</div>
+                            <div><strong>Total:</strong> R$ ${reservation.total ? reservation.total.toFixed(2) : '0.00'}</div>
+                            <div><strong>Token:</strong> ${reservation.userId || 'N/A'}</div>
+                            <div style="margin:8px 0;"><strong>Cotas:</strong> ${reservation.numbers ? reservation.numbers.join(', ') : 'Nenhuma'}</div>
+                            <div class="reservation-actions">
+                                <button class="btn-confirm" data-id="${reservation.id}" data-raffle="${reservation.raffleId}">
+                                    <i class="fas fa-check"></i> Confirmar
+                                </button>
+                                <button class="btn-cancel" data-id="${reservation.id}" data-raffle="${reservation.raffleId}">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        `;
+                        reservationsList.appendChild(reservationItem);
+                    });
+                    
+                    document.querySelectorAll('.btn-confirm').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.closest('button').dataset.id;
+                            const raffleId = e.target.closest('button').dataset.raffle;
+                            confirmReservation(id, raffleId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.btn-cancel').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.closest('button').dataset.id;
+                            const raffleId = e.target.closest('button').dataset.raffle;
+                            cancelReservation(id, raffleId);
+                        });
+                    });
+                    
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar reservas:", error);
+                    reservationsList.innerHTML = `<p style="color:var(--danger);">Erro ao carregar reservas</p>`;
+                });
+        });
+    }
+    
+    function confirmReservation(purchaseId, raffleId) {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        db.collection("purchases").doc(purchaseId).get()
+            .then(doc => {
+                if (!doc.exists) {
+                    throw new Error("Reserva não encontrada");
+                }
+                
+                const reservation = doc.data();
+                
+                return db.collection("purchases").doc(purchaseId).update({
+                    status: 'confirmed',
+                    confirmedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => reservation);
+            })
+            .then(reservation => {
+                const updates = {};
+                reservation.numbers.forEach(number => {
+                    updates[`purchases.${number}.status`] = 'confirmed';
+                    updates[`purchases.${number}.confirmedAt`] = firebase.firestore.FieldValue.serverTimestamp();
+                });
+                
+                return db.collection("raffles").doc(raffleId).update(updates)
+                    .then(() => reservation);
+            })
+            .then(reservation => {
+                return db.collection("raffles").doc(raffleId).get()
+                    .then(raffleDoc => {
+                        const raffleData = raffleDoc.data();
+                        const premiumNumbersInReservation = reservation.numbers.filter(n => 
+                            raffleData.premiumNumbers && raffleData.premiumNumbers.includes(n)
+                        );
+                        
+                        if (premiumNumbersInReservation.length > 0) {
+                            const winnerUpdates = {};
+                            premiumNumbersInReservation.forEach(number => {
+                                winnerUpdates[`premiumWinners.${number}`] = {
+                                    userId: reservation.userId,
+                                    userName: reservation.userName,
+                                    number: number,
+                                    wonAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    purchaseId: purchaseId
+                                };
+                            });
+                            
+                            return db.collection("raffles").doc(raffleId).update(winnerUpdates)
+                                .then(() => ({ reservation, premiumNumbersInReservation }));
+                        }
+                        return { reservation, premiumNumbersInReservation };
+                    });
+            })
+            .then(({ reservation, premiumNumbersInReservation }) => {
+                showToast('Reserva confirmada!', 'success');
+                
+                if (premiumNumbersInReservation.length > 0) {
+                    showToast(
+                        `🎉 ${reservation.userName} ganhou ${premiumNumbersInReservation.length} cota(s) premiada(s)!`, 
+                        'success'
+                    );
+                    
+                    console.log(`Prêmio registrado:`, premiumNumbersInReservation);
+                }
+                
+                loadPendingReservations();
+                loadRaffles();
+            })
+            .catch(error => {
+                console.error("Erro ao confirmar reserva:", error);
+                showToast(`Erro: ${error.message}`, 'error');
+            });
+    }
+    
+    function cancelReservation(purchaseId, raffleId) {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        db.collection("purchases").doc(purchaseId).get()
+            .then(doc => {
+                if (!doc.exists) {
+                    throw new Error("Reserva não encontrada");
+                }
+                
+                const reservation = doc.data();
+                
+                return db.collection("purchases").doc(purchaseId).update({
+                    status: 'cancelled',
+                    cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => reservation);
+            })
+            .then(reservation => {
+                const updates = {};
+                reservation.numbers.forEach(number => {
+                    updates[`purchases.${number}`] = firebase.firestore.FieldValue.delete();
+                });
+                
+                return db.collection("raffles").doc(raffleId).update(updates);
+            })
+            .then(() => {
+                showToast('Reserva cancelada!', 'success');
+                loadPendingReservations();
+                loadRaffles();
+            })
+            .catch(error => {
+                console.error("Erro ao cancelar reserva:", error);
+                showToast(`Erro: ${error.message}`, 'error');
+            });
+    }
+    
+    function setWinner() {
+        const raffleId = raffleIdSelect.value;
+        const winnerNumber = parseInt(winnerNumberInput.value);
+        
+        if (!raffleId || raffleId === 'new') {
+            showToast('Selecione uma rifa válida', 'error');
+            return;
+        }
+        
+        if (isNaN(winnerNumber) || winnerNumber < 1) {
+            showToast('Informe um número válido', 'error');
+            return;
+        }
+        
+        const raffle = raffles.find(r => r.id === raffleId);
+        if (!raffle) {
+            showToast('Rifa não encontrada', 'error');
+            return;
+        }
+        
+        if (winnerNumber > raffle.totalNumbers) {
+            showToast(`Número deve ser entre 1 e ${raffle.totalNumbers}`, 'error');
+            return;
+        }
+        
+        const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
+        if (soldNumbers < raffle.totalNumbers) {
+            showToast('Todas as cotas precisam estar vendidas', 'error');
+            return;
+        }
+        
+        let winnerName = 'A ser anunciado';
+        if (raffle.purchases && raffle.purchases[winnerNumber]) {
+            const purchase = raffle.purchases[winnerNumber];
+            if (purchase.userName) {
+                winnerName = purchase.userName;
+            }
+        }
+        
+        db.collection("raffles").doc(raffleId).update({
+            winningNumber: winnerNumber,
+            winnerName: winnerName,
+            status: 'completed',
+            drawDate: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            showToast('Vencedor definido!', 'success');
+            winnerNumberInput.value = '';
+            winnerInputSection.style.display = 'none';
+            loadRaffles();
+            fillAdminForm();
+        })
+        .catch(error => {
+            console.error("Erro ao definir vencedor:", error);
+            showToast('Erro ao definir vencedor', 'error');
+        });
+    }
+    
+    function autoDrawWinner() {
+        const raffleId = raffleIdSelect.value;
+        
+        if (!raffleId || raffleId === 'new') {
+            showToast('Selecione uma rifa válida', 'error');
+            return;
+        }
+        
+        const raffle = raffles.find(r => r.id === raffleId);
+        if (!raffle) {
+            showToast('Rifa não encontrada', 'error');
+            return;
+        }
+        
+        const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
+        if (soldNumbers < raffle.totalNumbers) {
+            showToast('Todas as cotas precisam estar vendidas', 'error');
+            return;
+        }
+        
+        const winnerNumber = Math.floor(Math.random() * raffle.totalNumbers) + 1;
+        winnerNumberInput.value = winnerNumber;
+        
+        showToast(`Número ${winnerNumber} sorteado! Clique em "Definir Vencedor".`, 'info');
+    }
+    
+    function performAutoDraw(raffleId) {
+        const raffle = raffles.find(r => r.id === raffleId);
+        if (!raffle) {
+            showToast('Rifa não encontrada', 'error');
+            return;
+        }
+        
+        const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
+        if (soldNumbers < raffle.totalNumbers) {
+            showToast('Todas as cotas precisam estar vendidas', 'error');
+            return;
+        }
+        
+        const winnerNumber = Math.floor(Math.random() * raffle.totalNumbers) + 1;
+        
+        let winnerName = 'A ser anunciado';
+        if (raffle.purchases && raffle.purchases[winnerNumber]) {
+            const purchase = raffle.purchases[winnerNumber];
+            if (purchase.userName) {
+                winnerName = purchase.userName;
+            }
+        }
+        
+        db.collection("raffles").doc(raffleId).update({
+            winningNumber: winnerNumber,
+            winnerName: winnerName,
+            winnerMessage: 'Parabéns ao vencedor sorteado automaticamente!',
+            status: 'completed',
+            drawDate: firebase.firestore.FieldValue.serverTimestamp(),
+            announcedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            showToast(`Vencedor sorteado: Número ${winnerNumber}`, 'success');
+            loadRaffles();
+        })
+        .catch(error => {
+            console.error("Erro ao sortear:", error);
+            showToast('Erro ao sortear', 'error');
+        });
+    }
+    
+    function formatTime(date) {
+        if (!date) return 'Data desconhecida';
+        return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+</script>
 </body>
 </html>
