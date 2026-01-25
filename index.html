@@ -882,6 +882,54 @@
             color: var(--border);
         }
 
+        /* Estilos para a seção de limpeza de rifas */
+        .cleanup-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .completed-raffles-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            background-color: var(--body-bg);
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .completed-raffle-item {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background-color: var(--card-bg);
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .raffle-info-small {
+            flex-grow: 1;
+        }
+
+        .raffle-info-small h4 {
+            margin-bottom: 4px;
+            color: var(--primary);
+        }
+
+        .btn-delete-raffle {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
         @media (max-width: 360px) {
             .raffles-grid {
                 grid-template-columns: 1fr;
@@ -1022,6 +1070,17 @@
                     <button class="btn-admin" id="set-winner">Definir Vencedor</button>
                 </div>
             </div>
+            
+            <div class="cleanup-section" id="cleanup-section" style="display: none;">
+                <h3>Limpeza de Rifas Sorteadas</h3>
+                <p>Remova rifas já sorteadas para evitar acúmulo no sistema:</p>
+                <div class="completed-raffles-list" id="completed-raffles-list">
+                    <!-- Rifas sorteadas serão carregadas aqui -->
+                </div>
+                <button class="btn-admin" id="load-completed-raffles" style="background:var(--warning);margin-top:10px;">
+                    <i class="fas fa-sync"></i> Carregar Rifas Sorteadas
+                </button>
+            </div>
         </div>
 
         <div class="status-bar" id="status-bar">
@@ -1115,10 +1174,16 @@
                 <div style="background:var(--body-bg);padding:15px;border-radius:6px;margin:15px 0;text-align:center;word-break:break-all;">
                     <strong id="token-display">TOK-XXXXXXXX</strong>
                 </div>
+                <p style="margin-top:15px;color:var(--warning);">
+                    <i class="fas fa-exclamation-triangle"></i> Este token está associado ao dispositivo atual.
+                </p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="flex-direction:column;gap:10px;">
                 <button class="btn-admin" id="copy-token" style="width:100%;">
                     <i class="fas fa-copy"></i> Copiar Token
+                </button>
+                <button class="btn-admin" id="change-token" style="width:100%;background:var(--warning);">
+                    <i class="fas fa-exchange-alt"></i> Trocar Token / Sair
                 </button>
             </div>
         </div>
@@ -1234,6 +1299,7 @@
     const tokenSetupModal = document.getElementById('token-setup-modal');
     const tokenDisplay = document.getElementById('token-display');
     const copyTokenBtn = document.getElementById('copy-token');
+    const changeTokenBtn = document.getElementById('change-token');
     const instructionsBtn = document.getElementById('instructions-btn');
     const instructionsModal = document.getElementById('instructions-modal');
     const filterButtons = document.querySelectorAll('.filter-btn');
@@ -1286,6 +1352,9 @@
     const participationList = document.getElementById('participation-list');
     const noParticipations = document.getElementById('no-participations');
     const whatsappNumberInput = document.getElementById('whatsapp-number');
+    const cleanupSection = document.getElementById('cleanup-section');
+    const completedRafflesList = document.getElementById('completed-raffles-list');
+    const loadCompletedRafflesBtn = document.getElementById('load-completed-raffles');
 
     // Estado da aplicação
     let userToken = localStorage.getItem('userToken') || null;
@@ -1309,6 +1378,7 @@
         adminPanel.style.display = 'none';
         reservationsPanel.style.display = 'none';
         winnerInputSection.style.display = 'none';
+        cleanupSection.style.display = 'none';
         
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -1335,6 +1405,7 @@
         tokenBtn.addEventListener('click', showTokenModal);
         participationBtn.addEventListener('click', showParticipationModal);
         copyTokenBtn.addEventListener('click', copyTokenToClipboard);
+        changeTokenBtn.addEventListener('click', changeToken);
         instructionsBtn.addEventListener('click', () => {
             instructionsModal.style.display = 'flex';
         });
@@ -1364,6 +1435,7 @@
         btnLogin.addEventListener('click', handleLogin);
         raffleIdSelect.addEventListener('change', fillAdminForm);
         setWinnerBtn.addEventListener('click', setWinner);
+        loadCompletedRafflesBtn.addEventListener('click', loadCompletedRaffles);
         
         // Token Setup Tabs
         tabNewToken.addEventListener('click', () => {
@@ -1407,6 +1479,45 @@
             }
         });
     });
+
+    function changeToken() {
+        if (confirm('Deseja trocar de token? Isso irá remover seu token atual e você precisará configurar um novo token.')) {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userIsAdmin');
+            localStorage.removeItem('whatsappNumber');
+            
+            auth.signOut().then(() => {
+                showToast('Token removido. Configure um novo token.', 'info');
+            });
+            
+            userInfo.style.display = 'none';
+            adminInfo.style.display = 'none';
+            adminPanel.style.display = 'none';
+            reservationsPanel.style.display = 'none';
+            winnerInputSection.style.display = 'none';
+            cleanupSection.style.display = 'none';
+            userIsAdmin = false;
+            
+            userToken = null;
+            userName = null;
+            currentAdminUserId = null;
+            
+            tokenModal.style.display = 'none';
+            tokenSetupModal.style.display = 'flex';
+            
+            // Limpar a lista de rifas
+            rafflesContainer.innerHTML = `
+                <div style="text-align:center;padding:40px;">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando rifas...
+                </div>
+            `;
+            
+            if (unsubscribeRaffles) {
+                unsubscribeRaffles();
+            }
+        }
+    }
 
     function loadWhatsappNumber() {
         if (!userIsAdmin && !currentAdminUserId) {
@@ -1490,6 +1601,7 @@
                 if (isAdminUser) {
                     adminInfo.style.display = 'block';
                     reservationsPanel.style.display = 'block';
+                    cleanupSection.style.display = 'block';
                     userIsAdmin = true;
                     localStorage.setItem('userIsAdmin', 'true');
                     loadPendingReservations();
@@ -1497,6 +1609,7 @@
                 } else {
                     adminInfo.style.display = 'none';
                     reservationsPanel.style.display = 'none';
+                    cleanupSection.style.display = 'none';
                     userIsAdmin = false;
                     localStorage.setItem('userIsAdmin', 'false');
                 }
@@ -1504,6 +1617,7 @@
                 console.error("Erro em updateUIOnChanges:", error);
                 adminInfo.style.display = 'none';
                 reservationsPanel.style.display = 'none';
+                cleanupSection.style.display = 'none';
                 userIsAdmin = false;
                 localStorage.setItem('userIsAdmin', 'false');
             });
@@ -1512,6 +1626,7 @@
             adminInfo.style.display = 'none';
             reservationsPanel.style.display = 'none';
             winnerInputSection.style.display = 'none';
+            cleanupSection.style.display = 'none';
             userIsAdmin = false;
             localStorage.setItem('userIsAdmin', 'false');
         }
@@ -2127,6 +2242,7 @@
             localStorage.setItem('userIsAdmin', 'true');
             adminInfo.style.display = 'block';
             reservationsPanel.style.display = 'block';
+            cleanupSection.style.display = 'block';
             adminPanel.style.display = 'block';
             showToast('Agora você é administrador!', 'success');
             loadPendingReservations();
@@ -2356,6 +2472,7 @@
                     if (isAdminUser) {
                         adminInfo.style.display = 'block';
                         reservationsPanel.style.display = 'block';
+                        cleanupSection.style.display = 'block';
                         adminPanel.style.display = 'block';
                         userIsAdmin = true;
                         localStorage.setItem('userIsAdmin', 'true');
@@ -2402,6 +2519,7 @@
         adminPanel.style.display = 'none';
         reservationsPanel.style.display = 'none';
         winnerInputSection.style.display = 'none';
+        cleanupSection.style.display = 'none';
         userIsAdmin = false;
         
         userToken = null;
@@ -2707,6 +2825,113 @@
                     reservationsList.innerHTML = `<p style="color:var(--danger);">Erro ao carregar reservas</p>`;
                 });
         });
+    }
+    
+    function loadCompletedRaffles() {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        completedRafflesList.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> Carregando rifas sorteadas...</div>';
+        
+        db.collection("raffles")
+            .where("status", "==", "completed")
+            .get()
+            .then((snapshot) => {
+                completedRafflesList.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    completedRafflesList.innerHTML = '<p style="text-align:center;padding:20px;color:var(--secondary);">Nenhuma rifa sorteada encontrada.</p>';
+                    return;
+                }
+                
+                const completedRaffles = [];
+                snapshot.forEach(doc => {
+                    completedRaffles.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Ordenar por data (mais antigas primeiro)
+                completedRaffles.sort((a, b) => {
+                    const dateA = a.drawDate ? a.drawDate.toDate() : new Date(0);
+                    const dateB = b.drawDate ? b.drawDate.toDate() : new Date(0);
+                    return dateA - dateB;
+                });
+                
+                completedRaffles.forEach(raffle => {
+                    const raffleItem = document.createElement('div');
+                    raffleItem.className = 'completed-raffle-item';
+                    
+                    const drawDate = raffle.drawDate ? raffle.drawDate.toDate() : null;
+                    const drawDateStr = drawDate ? formatDate(drawDate) : 'Data desconhecida';
+                    
+                    raffleItem.innerHTML = `
+                        <div class="raffle-info-small">
+                            <h4>${raffle.title}</h4>
+                            <div><strong>Sorteada em:</strong> ${drawDateStr}</div>
+                            <div><strong>Vencedor:</strong> ${raffle.winnerName || 'Não definido'}</div>
+                            <div><strong>Número sorteado:</strong> ${raffle.winningNumber || 'Não definido'}</div>
+                        </div>
+                        <button class="btn-delete-raffle" data-id="${raffle.id}" data-title="${raffle.title}">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    `;
+                    
+                    completedRafflesList.appendChild(raffleItem);
+                });
+                
+                // Adicionar event listeners para os botões de exclusão
+                completedRafflesList.querySelectorAll('.btn-delete-raffle').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const raffleId = e.target.closest('button').dataset.id;
+                        const raffleTitle = e.target.closest('button').dataset.title;
+                        deleteCompletedRaffle(raffleId, raffleTitle);
+                    });
+                });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar rifas sorteadas:", error);
+                completedRafflesList.innerHTML = `<p style="color:var(--danger);text-align:center;">Erro ao carregar rifas sorteadas</p>`;
+            });
+    }
+    
+    function deleteCompletedRaffle(raffleId, raffleTitle) {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        if (!confirm(`Tem certeza que deseja excluir a rifa "${raffleTitle}"?\n\nEsta ação é IRREVERSÍVEL e removerá permanentemente:\n- A rifa\n- Todas as compras associadas\n- Histórico de vencedores\n\nClique em OK para confirmar.`)) {
+            return;
+        }
+        
+        // Primeiro, buscar todas as compras associadas a esta rifa
+        db.collection("purchases")
+            .where("raffleId", "==", raffleId)
+            .get()
+            .then(snapshot => {
+                const batch = db.batch();
+                
+                // Excluir todas as compras associadas
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                
+                // Excluir a rifa
+                const raffleRef = db.collection("raffles").doc(raffleId);
+                batch.delete(raffleRef);
+                
+                return batch.commit();
+            })
+            .then(() => {
+                showToast(`Rifa "${raffleTitle}" excluída com sucesso!`, 'success');
+                loadCompletedRaffles(); // Recarregar a lista
+                loadRaffles(); // Recarregar a lista principal de rifas
+            })
+            .catch(error => {
+                console.error("Erro ao excluir rifa:", error);
+                showToast('Erro ao excluir rifa', 'error');
+            });
     }
     
     function confirmReservation(purchaseId, raffleId) {
