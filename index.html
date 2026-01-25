@@ -814,6 +814,86 @@
             flex: 1;
         }
 
+        /* Novos estilos para a funcionalidade de verificar participação */
+        .participation-item {
+            background: var(--body-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .participation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .participation-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .participation-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-confirmed {
+            background-color: var(--success);
+        }
+
+        .status-pending {
+            background-color: var(--warning);
+        }
+
+        .status-cancelled {
+            background-color: var(--danger);
+        }
+
+        .participation-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .participation-number {
+            padding: 4px 10px;
+            background: var(--info);
+            color: white;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .participation-premium {
+            background: var(--premium-color);
+        }
+
+        .participation-winner {
+            background: var(--warning);
+        }
+
+        .no-participations {
+            text-align: center;
+            padding: 30px;
+            color: var(--secondary);
+        }
+
+        .no-participations i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--border);
+        }
+
         @media (max-width: 360px) {
             .raffles-grid {
                 grid-template-columns: 1fr;
@@ -855,6 +935,9 @@
             <div class="header-right">
                 <button class="header-btn" id="instructions-btn" title="Instruções">
                     <i class="fas fa-info"></i>
+                </button>
+                <button class="header-btn" id="participation-btn" title="Minhas Participações">
+                    <i class="fas fa-ticket-alt"></i>
                 </button>
                 <button class="header-btn" id="token-btn" title="Token">
                     <i class="fas fa-key"></i>
@@ -1105,6 +1188,34 @@
         </div>
     </div>
 
+    <!-- Modal de Verificar Participação -->
+    <div class="modal" id="participation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Minhas Participações</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="participation-loading" style="text-align:center;padding:20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando suas participações...
+                </div>
+                <div id="participation-content" style="display:none;">
+                    <div id="participation-list">
+                        <!-- Lista de participações será carregada aqui -->
+                    </div>
+                    <div id="no-participations" class="no-participations" style="display:none;">
+                        <i class="fas fa-ticket-alt"></i>
+                        <h3>Nenhuma participação encontrada</h3>
+                        <p>Você ainda não participou de nenhuma rifa.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" id="btn-close-participation">Fechar</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     // Configuração do Firebase
     const firebaseConfig = {
@@ -1125,8 +1236,9 @@
     // Elementos DOM
     const rafflesContainer = document.getElementById('raffles-container');
     const tokenBtn = document.getElementById('token-btn');
+    const participationBtn = document.getElementById('participation-btn');
     const tokenModal = document.getElementById('token-modal');
-    const tokenSetupModal = document.getElementById('token-setup-modal');
+    const participationModal = document.getElementById('participation-modal');
     const tokenDisplay = document.getElementById('token-display');
     const copyTokenBtn = document.getElementById('copy-token');
     const instructionsBtn = document.getElementById('instructions-btn');
@@ -1146,6 +1258,7 @@
     const purchaseModal = document.getElementById('purchase-modal');
     const btnWhatsapp = document.getElementById('btn-whatsapp');
     const btnClosePurchase = document.getElementById('btn-close-purchase');
+    const btnCloseParticipation = document.getElementById('btn-close-participation');
     const firebaseStatus = document.getElementById('firebase-status');
     const adminInfo = document.getElementById('admin-info');
     const userInfo = document.getElementById('user-info');
@@ -1175,6 +1288,10 @@
     const winnerNumberInput = document.getElementById('winner-number');
     const setWinnerBtn = document.getElementById('set-winner');
     const autoDrawBtn = document.getElementById('auto-draw');
+    const participationLoading = document.getElementById('participation-loading');
+    const participationContent = document.getElementById('participation-content');
+    const participationList = document.getElementById('participation-list');
+    const noParticipations = document.getElementById('no-participations');
 
     // Estado da aplicação
     let userToken = localStorage.getItem('userToken') || null;
@@ -1219,6 +1336,7 @@
         
         // Event listeners
         tokenBtn.addEventListener('click', showTokenModal);
+        participationBtn.addEventListener('click', showParticipationModal);
         copyTokenBtn.addEventListener('click', copyTokenToClipboard);
         instructionsBtn.addEventListener('click', () => {
             instructionsModal.style.display = 'flex';
@@ -1226,6 +1344,9 @@
         btnLogout.addEventListener('click', handleLogout);
         btnClosePurchase.addEventListener('click', () => {
             purchaseModal.style.display = 'none';
+        });
+        btnCloseParticipation.addEventListener('click', () => {
+            participationModal.style.display = 'none';
         });
         
         // Filtros
@@ -2224,6 +2345,201 @@
             tokenSetupModal.style.display = 'flex';
         }
     }
+
+    function showParticipationModal() {
+        if (!userToken) {
+            showToast('Configure um token primeiro', 'error');
+            tokenSetupModal.style.display = 'flex';
+            return;
+        }
+        
+        participationModal.style.display = 'flex';
+        loadUserParticipations();
+    }
+    
+    function loadUserParticipations() {
+        participationLoading.style.display = 'block';
+        participationContent.style.display = 'none';
+        noParticipations.style.display = 'none';
+        
+        // Buscar todas as compras do usuário
+        db.collection("purchases")
+            .where("userId", "==", userToken)
+            .get()
+            .then((snapshot) => {
+                if (snapshot.empty) {
+                    participationLoading.style.display = 'none';
+                    noParticipations.style.display = 'block';
+                    participationContent.style.display = 'block';
+                    return;
+                }
+                
+                const participations = [];
+                snapshot.forEach(doc => {
+                    participations.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Ordenar por data (mais recente primeiro)
+                participations.sort((a, b) => {
+                    const dateA = a.reservedAt ? a.reservedAt.toDate() : new Date(0);
+                    const dateB = b.reservedAt ? b.reservedAt.toDate() : new Date(0);
+                    return dateB - dateA;
+                });
+                
+                // Buscar informações das rifas
+                const rafflePromises = participations.map(participation => 
+                    db.collection("raffles").doc(participation.raffleId).get()
+                );
+                
+                return Promise.all(rafflePromises)
+                    .then(raffleSnapshots => {
+                        const participationData = [];
+                        
+                        raffleSnapshots.forEach((raffleDoc, index) => {
+                            if (raffleDoc.exists) {
+                                const raffleData = raffleDoc.data();
+                                participationData.push({
+                                    purchase: participations[index],
+                                    raffle: { id: raffleDoc.id, ...raffleData }
+                                });
+                            }
+                        });
+                        
+                        displayParticipations(participationData);
+                    });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar participações:", error);
+                participationLoading.style.display = 'none';
+                participationList.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:var(--danger);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Erro ao carregar participações. Tente novamente.</p>
+                    </div>
+                `;
+                participationContent.style.display = 'block';
+            });
+    }
+    
+    function displayParticipations(participationData) {
+        participationList.innerHTML = '';
+        
+        if (participationData.length === 0) {
+            participationLoading.style.display = 'none';
+            noParticipations.style.display = 'block';
+            participationContent.style.display = 'block';
+            return;
+        }
+        
+        participationData.forEach(item => {
+            const purchase = item.purchase;
+            const raffle = item.raffle;
+            
+            // Verificar se há números premiados nesta compra
+            const premiumNumbers = raffle.premiumNumbers || [];
+            const premiumNumbersInPurchase = purchase.numbers.filter(n => premiumNumbers.includes(n));
+            
+            // Verificar se o usuário é vencedor da rifa
+            const isWinner = raffle.winningNumber && purchase.numbers.includes(raffle.winningNumber);
+            
+            // Verificar se há números premiados que o usuário ganhou
+            const premiumWinners = raffle.premiumWinners || {};
+            const userPremiumWins = purchase.numbers.filter(n => 
+                premiumWinners[n] && premiumWinners[n].userId === userToken
+            );
+            
+            const participationItem = document.createElement('div');
+            participationItem.className = 'participation-item';
+            
+            let statusClass = '';
+            let statusText = '';
+            
+            switch(purchase.status) {
+                case 'confirmed':
+                    statusClass = 'status-confirmed';
+                    statusText = 'CONFIRMADO';
+                    break;
+                case 'pending':
+                    statusClass = 'status-pending';
+                    statusText = 'PENDENTE';
+                    break;
+                case 'cancelled':
+                    statusClass = 'status-cancelled';
+                    statusText = 'CANCELADO';
+                    break;
+            }
+            
+            participationItem.innerHTML = `
+                <div class="participation-header">
+                    <div class="participation-title">${raffle.title}</div>
+                    <div class="participation-status ${statusClass}">${statusText}</div>
+                </div>
+                
+                <div style="margin-bottom:10px;">
+                    <div><strong>Data:</strong> ${purchase.reservedAt ? formatDate(purchase.reservedAt.toDate()) : 'N/A'}</div>
+                    <div><strong>Código:</strong> ${purchase.code}</div>
+                    <div><strong>Valor total:</strong> R$ ${purchase.total ? purchase.total.toFixed(2) : '0.00'}</div>
+                    <div><strong>Quantidade de cotas:</strong> ${purchase.numbers.length}</div>
+                </div>
+                
+                <div><strong>Suas cotas:</strong></div>
+                <div class="participation-numbers">
+                    ${purchase.numbers.map(number => {
+                        let className = 'participation-number';
+                        let extraText = '';
+                        
+                        if (premiumNumbersInPurchase.includes(number)) {
+                            if (userPremiumWins.includes(number)) {
+                                className += ' participation-premium';
+                                extraText = ' 🏆 PREMIADA!';
+                            }
+                        }
+                        
+                        if (isWinner && number === raffle.winningNumber) {
+                            className += ' participation-winner';
+                            extraText = ' 👑 VENCEDOR!';
+                        }
+                        
+                        return `<span class="${className}">${number}${extraText}</span>`;
+                    }).join('')}
+                </div>
+                
+                ${isWinner ? `
+                    <div style="margin-top:10px;padding:10px;background:rgba(243,156,18,0.1);border-radius:6px;">
+                        <strong>🎉 PARABÉNS! 🎉</strong>
+                        <p>Você é o vencedor desta rifa com a cota ${raffle.winningNumber}!</p>
+                    </div>
+                ` : ''}
+                
+                ${userPremiumWins.length > 0 ? `
+                    <div style="margin-top:10px;padding:10px;background:rgba(155,89,182,0.1);border-radius:6px;">
+                        <strong>🎁 PRÊMIO INSTANTÂNEO!</strong>
+                        <p>Você ganhou ${userPremiumWins.length} cota(s) premiada(s): ${userPremiumWins.join(', ')}</p>
+                    </div>
+                ` : ''}
+                
+                ${purchase.status === 'pending' ? `
+                    <div style="margin-top:10px;padding:10px;background:rgba(52,152,219,0.1);border-radius:6px;">
+                        <strong>⏰ RESERVA PENDENTE</strong>
+                        <p>Envie o comprovante de pagamento para confirmar suas cotas.</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            participationList.appendChild(participationItem);
+        });
+        
+        participationLoading.style.display = 'none';
+        participationContent.style.display = 'block';
+    }
+    
+    function formatDate(date) {
+        if (!date) return 'Data desconhecida';
+        return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
     
     function copyTokenToClipboard() {
         navigator.clipboard.writeText(userToken)
@@ -2276,7 +2592,7 @@
                         reservationItem.innerHTML = `
                             <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                                 <strong>${reservation.userName || 'Cliente'}</strong>
-                                <small>${formatTime(reservation.reservedAt ? reservation.reservedAt.toDate() : new Date())}</small>
+                                <small>${formatDate(reservation.reservedAt ? reservation.reservedAt.toDate() : new Date())}</small>
                             </div>
                             <div><strong>Rifa ID:</strong> ${reservation.raffleId || 'N/A'}</div>
                             <div><strong>Código:</strong> ${reservation.code || 'N/A'}</div>
@@ -2557,17 +2873,6 @@
             showToast('Erro ao sortear', 'error');
         });
     }
-    
-    function formatTime(date) {
-        if (!date) return 'Data desconhecida';
-        return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-    }
 </script>
 </body>
 </html>
-
-
-
