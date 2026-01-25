@@ -802,18 +802,6 @@
             flex: 1;
         }
 
-        .btn-auto-draw {
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            flex: 1;
-        }
-
         /* Novos estilos para a funcionalidade de verificar participação */
         .participation-item {
             background: var(--body-bg);
@@ -1004,6 +992,13 @@
                     </div>
                 </div>
                 
+                <div class="admin-form-group">
+                    <label for="whatsapp-number">Número do WhatsApp para contato:</label>
+                    <input type="text" id="whatsapp-number" placeholder="5511999999999">
+                    <small>Formato: 5511999999999 (sem espaços ou caracteres especiais)</small>
+                </div>
+                
+                <button class="btn-admin" id="save-settings">Salvar Configurações</button>
                 <button class="btn-admin" id="save-raffle">Salvar Rifa</button>
                 <button class="btn-admin" id="make-admin" style="background:var(--info);">
                     <i class="fas fa-user-crown"></i> Tornar-se Administrador
@@ -1025,9 +1020,6 @@
                         <input type="number" id="winner-number" min="1">
                     </div>
                     <button class="btn-admin" id="set-winner">Definir Vencedor</button>
-                    <button class="btn-admin" id="auto-draw" style="background:var(--danger);">
-                        <i class="fas fa-random"></i> Sortear Automaticamente
-                    </button>
                 </div>
             </div>
         </div>
@@ -1249,6 +1241,7 @@
     const adminPanel = document.getElementById('admin-panel');
     const raffleIdSelect = document.getElementById('raffle-id');
     const saveRaffleBtn = document.getElementById('save-raffle');
+    const saveSettingsBtn = document.getElementById('save-settings');
     const makeAdminBtn = document.getElementById('make-admin');
     const loginModal = document.getElementById('login-modal');
     const adminEmailInput = document.getElementById('admin-email');
@@ -1288,11 +1281,11 @@
     const winnerInputSection = document.getElementById('winner-input-section');
     const winnerNumberInput = document.getElementById('winner-number');
     const setWinnerBtn = document.getElementById('set-winner');
-    const autoDrawBtn = document.getElementById('auto-draw');
     const participationLoading = document.getElementById('participation-loading');
     const participationContent = document.getElementById('participation-content');
     const participationList = document.getElementById('participation-list');
     const noParticipations = document.getElementById('no-participations');
+    const whatsappNumberInput = document.getElementById('whatsapp-number');
 
     // Estado da aplicação
     let userToken = localStorage.getItem('userToken') || null;
@@ -1307,9 +1300,7 @@
     let premiumNumbers = [];
     let currentAdminUserId = null;
     let isProcessingReservation = false;
-
-    // Número do WhatsApp para contato
-    const whatsappNumber = "5511999999999";
+    let whatsappNumber = null;
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
@@ -1323,6 +1314,7 @@
             if (user) {
                 currentAdminUserId = user.uid;
                 updateUIOnChanges();
+                loadWhatsappNumber();
             } else {
                 currentAdminUserId = null;
                 updateUIOnChanges();
@@ -1336,6 +1328,7 @@
         } else {
             console.log('Token encontrado, carregando rifas');
             loadRaffles();
+            loadWhatsappNumber();
         }
         
         // Event listeners
@@ -1366,11 +1359,11 @@
         // Admin
         adminToggle.addEventListener('click', toggleAdminPanel);
         saveRaffleBtn.addEventListener('click', saveRaffle);
+        saveSettingsBtn.addEventListener('click', saveSettings);
         makeAdminBtn.addEventListener('click', makeAdmin);
         btnLogin.addEventListener('click', handleLogin);
         raffleIdSelect.addEventListener('change', fillAdminForm);
         setWinnerBtn.addEventListener('click', setWinner);
-        autoDrawBtn.addEventListener('click', autoDrawWinner);
         
         // Token Setup Tabs
         tabNewToken.addEventListener('click', () => {
@@ -1415,6 +1408,76 @@
         });
     });
 
+    function loadWhatsappNumber() {
+        if (!userIsAdmin && !currentAdminUserId) {
+            // Para usuários não-admin, tentar carregar do cache/localStorage primeiro
+            const cachedNumber = localStorage.getItem('whatsappNumber');
+            if (cachedNumber) {
+                whatsappNumber = cachedNumber;
+                return;
+            }
+        }
+        
+        // Buscar do Firestore
+        db.collection("settings").doc("whatsapp").get()
+            .then(doc => {
+                if (doc.exists && doc.data().number) {
+                    whatsappNumber = doc.data().number;
+                    localStorage.setItem('whatsappNumber', whatsappNumber);
+                    
+                    // Se for admin, preencher o campo no painel
+                    if (userIsAdmin && currentAdminUserId) {
+                        whatsappNumberInput.value = whatsappNumber;
+                    }
+                } else {
+                    // Número padrão de fallback
+                    whatsappNumber = "5511999999999";
+                    localStorage.setItem('whatsappNumber', whatsappNumber);
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao carregar número do WhatsApp:", error);
+                // Número padrão de fallback
+                whatsappNumber = "5511999999999";
+                localStorage.setItem('whatsappNumber', whatsappNumber);
+            });
+    }
+
+    function saveSettings() {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        const number = whatsappNumberInput.value.trim();
+        
+        if (!number || number.length < 11) {
+            showToast('Informe um número de WhatsApp válido', 'error');
+            return;
+        }
+        
+        // Validar formato (apenas números)
+        const cleanedNumber = number.replace(/\D/g, '');
+        if (cleanedNumber.length < 11) {
+            showToast('Número inválido. Formato: 5511999999999', 'error');
+            return;
+        }
+        
+        db.collection("settings").doc("whatsapp").set({
+            number: cleanedNumber,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            whatsappNumber = cleanedNumber;
+            localStorage.setItem('whatsappNumber', whatsappNumber);
+            showToast('Configurações salvas!', 'success');
+        })
+        .catch(error => {
+            console.error("Erro ao salvar configurações:", error);
+            showToast('Erro ao salvar configurações', 'error');
+        });
+    }
+
     function updateUIOnChanges() {
         const user = auth.currentUser;
         
@@ -1430,6 +1493,7 @@
                     userIsAdmin = true;
                     localStorage.setItem('userIsAdmin', 'true');
                     loadPendingReservations();
+                    loadWhatsappNumber(); // Recarregar número para admin
                 } else {
                     adminInfo.style.display = 'none';
                     reservationsPanel.style.display = 'none';
@@ -1496,6 +1560,7 @@
             tokenModal.style.display = 'flex';
             showToast('Token criado com sucesso!', 'success');
             loadRaffles();
+            loadWhatsappNumber();
         })
         .catch(error => {
             console.error("Erro ao salvar token:", error);
@@ -1524,6 +1589,7 @@
                 tokenSetupModal.style.display = 'none';
                 showToast('Token carregado! Bem-vindo!', 'success');
                 loadRaffles();
+                loadWhatsappNumber();
             } else {
                 showToast('Token não encontrado.', 'error');
             }
@@ -1751,9 +1817,6 @@
                             <button class="btn-set-winner" data-id="${raffle.id}">
                                 <i class="fas fa-trophy"></i> Definir Vencedor
                             </button>
-                            <button class="btn-auto-draw" data-id="${raffle.id}">
-                                <i class="fas fa-random"></i> Sortear Auto
-                            </button>
                         </div>
                     ` : ''}
                     
@@ -1773,7 +1836,6 @@
             
             if (soldNumbers === raffle.totalNumbers && !isCompleted && userIsAdmin) {
                 const setWinnerBtn = card.querySelector(`.btn-set-winner`);
-                const autoDrawBtn = card.querySelector(`.btn-auto-draw`);
                 
                 if (setWinnerBtn) {
                     setWinnerBtn.addEventListener('click', () => {
@@ -1784,14 +1846,6 @@
                         winnerNumberInput.max = raffle.totalNumbers;
                         winnerNumberInput.min = 1;
                         winnerNumberInput.value = '';
-                    });
-                }
-                
-                if (autoDrawBtn) {
-                    autoDrawBtn.addEventListener('click', () => {
-                        if (confirm(`Sortear vencedor para "${raffle.title}"?`)) {
-                            performAutoDraw(raffle.id);
-                        }
                     });
                 }
             }
@@ -1953,18 +2007,16 @@
         purchaseTotal.textContent = `R$ ${total.toFixed(2)}`;
         purchaseCode.textContent = code;
         
-        const message = encodeURIComponent(
-            `Olá! Reserva na rifa "${raffle.title}".\n` +
-            `Código: ${code}\n` +
-            `Cotas: ${numbers.join(', ')}\n` +
-            `Total: R$ ${total.toFixed(2)}\n` +
-            `Comprovante de pagamento:`
-        );
-        
-        const formattedNumber = whatsappNumber.replace(/\D/g, '');
-        btnWhatsapp.onclick = () => {
-            window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
-        };
+        // Verificar se temos o número do WhatsApp
+        if (!whatsappNumber) {
+            loadWhatsappNumber();
+            showToast('Carregando informações...', 'info');
+            setTimeout(() => {
+                setupWhatsappButton(raffle, numbers, code, total);
+            }, 1000);
+        } else {
+            setupWhatsappButton(raffle, numbers, code, total);
+        }
         
         purchaseModal.style.display = 'flex';
         
@@ -2017,6 +2069,21 @@
         });
     }
 
+    function setupWhatsappButton(raffle, numbers, code, total) {
+        const message = encodeURIComponent(
+            `Olá! Reserva na rifa "${raffle.title}".\n` +
+            `Código: ${code}\n` +
+            `Cotas: ${numbers.join(', ')}\n` +
+            `Total: R$ ${total.toFixed(2)}\n` +
+            `Comprovante de pagamento:`
+        );
+        
+        const formattedNumber = whatsappNumber.replace(/\D/g, '');
+        btnWhatsapp.onclick = () => {
+            window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
+        };
+    }
+
     function updateStatusBar() {
         const active = raffles.filter(r => r.status !== 'completed').length;
         const completed = raffles.filter(r => r.status === 'completed').length;
@@ -2063,6 +2130,7 @@
             adminPanel.style.display = 'block';
             showToast('Agora você é administrador!', 'success');
             loadPendingReservations();
+            loadWhatsappNumber();
         })
         .catch(error => {
             console.error("Erro ao tornar admin:", error);
@@ -2084,6 +2152,7 @@
                 adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
                 if (adminPanel.style.display === 'block') {
                     loadPendingReservations();
+                    loadWhatsappNumber();
                 }
             } else {
                 showToast('Você não tem permissões de administrador', 'error');
@@ -2291,6 +2360,7 @@
                         userIsAdmin = true;
                         localStorage.setItem('userIsAdmin', 'true');
                         loadPendingReservations();
+                        loadWhatsappNumber();
                     } else {
                         showToast('Login realizado, mas não é admin', 'info');
                     }
@@ -2808,73 +2878,6 @@
         .catch(error => {
             console.error("Erro ao definir vencedor:", error);
             showToast('Erro ao definir vencedor', 'error');
-        });
-    }
-    
-    function autoDrawWinner() {
-        const raffleId = raffleIdSelect.value;
-        
-        if (!raffleId || raffleId === 'new') {
-            showToast('Selecione uma rifa válida', 'error');
-            return;
-        }
-        
-        const raffle = raffles.find(r => r.id === raffleId);
-        if (!raffle) {
-            showToast('Rifa não encontrada', 'error');
-            return;
-        }
-        
-        const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
-        if (soldNumbers < raffle.totalNumbers) {
-            showToast('Todas as cotas precisam estar vendidas', 'error');
-            return;
-        }
-        
-        const winnerNumber = Math.floor(Math.random() * raffle.totalNumbers) + 1;
-        winnerNumberInput.value = winnerNumber;
-        
-        showToast(`Número ${winnerNumber} sorteado! Clique em "Definir Vencedor".`, 'info');
-    }
-    
-    function performAutoDraw(raffleId) {
-        const raffle = raffles.find(r => r.id === raffleId);
-        if (!raffle) {
-            showToast('Rifa não encontrada', 'error');
-            return;
-        }
-        
-        const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
-        if (soldNumbers < raffle.totalNumbers) {
-            showToast('Todas as cotas precisam estar vendidas', 'error');
-            return;
-        }
-        
-        const winnerNumber = Math.floor(Math.random() * raffle.totalNumbers) + 1;
-        
-        let winnerName = 'A ser anunciado';
-        if (raffle.purchases && raffle.purchases[winnerNumber]) {
-            const purchase = raffle.purchases[winnerNumber];
-            if (purchase.userName) {
-                winnerName = purchase.userName;
-            }
-        }
-        
-        db.collection("raffles").doc(raffleId).update({
-            winningNumber: winnerNumber,
-            winnerName: winnerName,
-            winnerMessage: 'Parabéns ao vencedor sorteado automaticamente!',
-            status: 'completed',
-            drawDate: firebase.firestore.FieldValue.serverTimestamp(),
-            announcedAt: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-            showToast(`Vencedor sorteado: Número ${winnerNumber}`, 'success');
-            loadRaffles();
-        })
-        .catch(error => {
-            console.error("Erro ao sortear:", error);
-            showToast('Erro ao sortear', 'error');
         });
     }
 </script>
