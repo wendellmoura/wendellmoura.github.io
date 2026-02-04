@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistema de Rifas Online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Adicionando jsPDF para geração de PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --primary: #2c3e50;
@@ -237,11 +240,15 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 6px;
             margin-bottom: 16px;
-            max-height: 140px;
+            max-height: 200px;
             overflow-y: auto;
             padding: 8px;
             background-color: var(--body-bg);
             border-radius: 6px;
+        }
+
+        .numbers-grid.scrollable {
+            pointer-events: auto !important;
         }
 
         .number-item {
@@ -802,7 +809,6 @@
             flex: 1;
         }
 
-        /* Novos estilos para a funcionalidade de verificar participação */
         .participation-item {
             background: var(--body-bg);
             border-radius: 8px;
@@ -882,7 +888,6 @@
             color: var(--border);
         }
 
-        /* Estilos para a seção de limpeza de rifas */
         .cleanup-section {
             margin-top: 20px;
             padding-top: 20px;
@@ -930,6 +935,294 @@
             margin-left: 10px;
         }
 
+        /* NOVOS ESTILOS PARA AS FUNCIONALIDADES ADICIONAIS - VERSÃO COMPACTA */
+        
+        .payment-countdown-compact {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--warning);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .countdown-timer-compact {
+            font-family: monospace;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            font-weight: bold;
+            color: var(--warning);
+        }
+
+        .pix-info-compact {
+            background: rgba(39, 174, 96, 0.05);
+            border: 1px solid rgba(39, 174, 96, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .pix-info-compact h4 {
+            color: var(--success);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pix-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .pix-row-compact {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .pix-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--success);
+            min-width: 60px;
+        }
+
+        .pix-key-compact {
+            flex: 1;
+            background: white;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-copy-pix-compact {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .pix-amount-compact {
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--success);
+        }
+
+        .btn-pay-pending {
+            background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .selection-mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: var(--info);
+            color: white;
+            border-color: var(--info);
+        }
+
+        .mode-btn i {
+            margin-right: 5px;
+        }
+
+        .admin-config-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .admin-config-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .admin-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .admin-checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .admin-checkbox label {
+            font-weight: 600;
+        }
+
+        .payment-details {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid var(--info);
+        }
+
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .manual-selection-info {
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: var(--warning);
+            text-align: center;
+        }
+
+        .auto-selection-info {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: var(--info);
+            text-align: center;
+        }
+
+        .btn-select-manual {
+            flex: 1;
+            background: linear-gradient(135deg, var(--warning) 0%, #d35400 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .time-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+
+        .expired-badge {
+            background: var(--danger);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        /* NOVOS ESTILOS PARA OS RELATÓRIOS */
+        .btn-generate-report {
+            background: linear-gradient(135deg, var(--premium-color) 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-expense-report {
+            background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .raffle-config-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .raffle-config-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
         @media (max-width: 360px) {
             .raffles-grid {
                 grid-template-columns: 1fr;
@@ -951,7 +1244,20 @@
                 flex-direction: column;
             }
             
-            .btn-select-random {
+            .btn-select-random, .btn-select-manual {
+                width: 100%;
+            }
+            
+            .selection-mode-selector {
+                flex-direction: column;
+            }
+            
+            .pix-row-compact {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-copy-pix-compact {
                 width: 100%;
             }
         }
@@ -1025,6 +1331,26 @@
                     <label for="total-numbers">Total de cotas:</label>
                     <input type="number" id="total-numbers" min="1" required>
                 </div>
+                
+                <!-- NOVOS CAMPOS PARA CONFIGURAÇÃO POR RIFA -->
+                <div class="raffle-config-section">
+                    <h3>Configurações Específicas da Rifa</h3>
+                    
+                    <div class="admin-form-group">
+                        <label for="max-per-token">Máximo de cotas por token (0 = ilimitado):</label>
+                        <input type="number" id="max-per-token" min="0" value="0">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="raffle-selection-mode">Modo de seleção:</label>
+                        <select id="raffle-selection-mode">
+                            <option value="both">Ambos (manual e aleatório)</option>
+                            <option value="manual">Apenas manual</option>
+                            <option value="auto">Apenas aleatório</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="admin-form-group">
                     <label for="raffle-image">URL da Imagem:</label>
                     <input type="text" id="raffle-image">
@@ -1051,6 +1377,43 @@
                 <button class="btn-admin" id="make-admin" style="background:var(--info);">
                     <i class="fas fa-user-crown"></i> Tornar-se Administrador
                 </button>
+                
+                <!-- BOTÃO PARA RELATÓRIO DE AUDITORIA -->
+                <button class="btn-generate-report" id="btn-audit-report">
+                    <i class="fas fa-file-pdf"></i> Gerar Relatório de Auditoria
+                </button>
+                
+                <!-- NOVA SEÇÃO DE CONFIGURAÇÕES DO SISTEMA -->
+                <div class="admin-config-section">
+                    <h3>Configurações do Sistema</h3>
+                    
+                    <div class="admin-form-group">
+                        <label for="pix-key">Chave PIX para pagamento:</label>
+                        <input type="text" id="pix-key" placeholder="Chave PIX (CPF, CNPJ, e-mail, telefone ou aleatória)">
+                    </div>
+                    
+                    <div class="admin-checkbox">
+                        <input type="checkbox" id="countdown-enabled">
+                        <label for="countdown-enabled">Habilitar contagem regressiva para pagamento</label>
+                    </div>
+                    
+                    <div class="admin-form-group" id="countdown-hours-group" style="display: none;">
+                        <label for="countdown-hours">Tempo para expiração (horas):</label>
+                        <input type="number" id="countdown-hours" min="1" value="24">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="selection-method">Método de seleção para rifas com mais de 100 cotas:</label>
+                        <select id="selection-method">
+                            <option value="manual">Permitir seleção manual</option>
+                            <option value="auto">Apenas seleção aleatória</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-admin" id="save-system-config">
+                        <i class="fas fa-save"></i> Salvar Configurações do Sistema
+                    </button>
+                </div>
             </div>
             
             <div class="reservations-panel" id="reservations-panel" style="display: none;">
@@ -1127,7 +1490,7 @@
         </div>
     </div>
 
-    <!-- Modal de Compra -->
+    <!-- Modal de Compra - VERSÃO COMPACTA -->
     <div class="modal" id="purchase-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1135,13 +1498,38 @@
                 <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <h3 id="purchase-title" style="margin-bottom:15px;">Carregando...</h3>
+                <h3 id="purchase-title" style="margin-bottom:10px;font-size:1.1rem;">Carregando...</h3>
+                
+                <!-- Contagem regressiva compacta -->
+                <div class="payment-countdown-compact" id="payment-countdown" style="display: none;">
+                    <i class="fas fa-clock"></i>
+                    <span>Tempo para pagamento:</span>
+                    <span class="countdown-timer-compact" id="countdown-timer">24:00:00</span>
+                </div>
                 
                 <div class="purchase-summary">
                     <p><strong>Cotas:</strong> <span id="purchase-numbers">0</span></p>
                     <p><strong>Quantidade:</strong> <span id="purchase-quantity">0</span></p>
                     <p><strong>Valor unitário:</strong> <span id="purchase-price">R$ 0,00</span></p>
                     <p><strong>Total:</strong> <span id="purchase-total">R$ 0,00</span></p>
+                </div>
+                
+                <!-- Informações de pagamento PIX compactas -->
+                <div class="pix-info-compact" id="pix-info" style="display: none;">
+                    <h4><i class="fas fa-qrcode"></i> PAGAMENTO VIA PIX</h4>
+                    <div class="pix-row">
+                        <div class="pix-row-compact">
+                            <span class="pix-label">Chave:</span>
+                            <span class="pix-key-compact" id="pix-key-display">Carregando...</span>
+                        </div>
+                        <button class="btn-copy-pix-compact" id="btn-copy-pix">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="pix-row-compact">
+                        <span class="pix-label">Valor:</span>
+                        <span class="pix-amount-compact" id="pix-amount">R$ 0,00</span>
+                    </div>
                 </div>
                 
                 <div class="code-generated">
@@ -1265,6 +1653,10 @@
                         <h3>Nenhuma participação encontrada</h3>
                         <p>Você ainda não participou de nenhuma rifa.</p>
                     </div>
+                    <!-- BOTÃO PARA RELATÓRIO DE GASTOS -->
+                    <button class="btn-expense-report" id="btn-expense-report">
+                        <i class="fas fa-file-pdf"></i> Gerar Relatório de Gastos
+                    </button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1355,6 +1747,26 @@
     const cleanupSection = document.getElementById('cleanup-section');
     const completedRafflesList = document.getElementById('completed-raffles-list');
     const loadCompletedRafflesBtn = document.getElementById('load-completed-raffles');
+    
+    // NOVOS ELEMENTOS PARA AS FUNCIONALIDADES ADICIONAIS
+    const countdownEnabledCheckbox = document.getElementById('countdown-enabled');
+    const countdownHoursGroup = document.getElementById('countdown-hours-group');
+    const countdownHoursInput = document.getElementById('countdown-hours');
+    const selectionMethodSelect = document.getElementById('selection-method');
+    const saveSystemConfigBtn = document.getElementById('save-system-config');
+    const pixKeyInput = document.getElementById('pix-key');
+    const paymentCountdown = document.getElementById('payment-countdown');
+    const countdownTimer = document.getElementById('countdown-timer');
+    const pixInfo = document.getElementById('pix-info');
+    const pixKeyDisplay = document.getElementById('pix-key-display');
+    const pixAmount = document.getElementById('pix-amount');
+    const btnCopyPix = document.getElementById('btn-copy-pix');
+    
+    // NOVOS ELEMENTOS PARA AS NOVAS FUNCIONALIDADES
+    const maxPerTokenInput = document.getElementById('max-per-token');
+    const raffleSelectionModeSelect = document.getElementById('raffle-selection-mode');
+    const btnAuditReport = document.getElementById('btn-audit-report');
+    const btnExpenseReport = document.getElementById('btn-expense-report');
 
     // Estado da aplicação
     let userToken = localStorage.getItem('userToken') || null;
@@ -1370,6 +1782,17 @@
     let currentAdminUserId = null;
     let isProcessingReservation = false;
     let whatsappNumber = null;
+    
+    // NOVAS VARIÁVEIS PARA AS FUNCIONALIDADES ADICIONAIS
+    let systemConfig = {
+        pixKey: null,
+        countdownEnabled: false,
+        countdownHours: 24,
+        selectionMethod: 'manual'
+    };
+    let activeCountdown = null;
+    let currentExpiresAt = null;
+    let autoCheckExpiredInterval = null;
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
@@ -1385,6 +1808,7 @@
                 currentAdminUserId = user.uid;
                 updateUIOnChanges();
                 loadWhatsappNumber();
+                loadSystemConfig();
             } else {
                 currentAdminUserId = null;
                 updateUIOnChanges();
@@ -1396,8 +1820,15 @@
             console.log('Não há token, exibindo modal de configuração');
             tokenSetupModal.style.display = 'flex';
         } else {
-            console.log('Token encontrado, carregando rifas');
-            loadRaffles();
+            console.log('Token encontrado, carregando configurações e rifas');
+            loadSystemConfig()
+                .then(() => {
+                    loadRaffles();
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar configurações, usando padrão", error);
+                    loadRaffles();
+                });
             loadWhatsappNumber();
         }
         
@@ -1412,6 +1843,10 @@
         btnLogout.addEventListener('click', handleLogout);
         btnClosePurchase.addEventListener('click', () => {
             purchaseModal.style.display = 'none';
+            if (activeCountdown) {
+                clearInterval(activeCountdown);
+                activeCountdown = null;
+            }
         });
         btnCloseParticipation.addEventListener('click', () => {
             participationModal.style.display = 'none';
@@ -1459,16 +1894,36 @@
         // Premium numbers
         addPremiumNumberBtn.addEventListener('click', addPremiumNumber);
         
-        // Fechar modais - CORREÇÃO: Não fechar o modal de configuração inicial automaticamente
+        // NOVOS EVENT LISTENERS PARA AS FUNCIONALIDADES ADICIONAIS
+        countdownEnabledCheckbox.addEventListener('change', function() {
+            countdownHoursGroup.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        saveSystemConfigBtn.addEventListener('click', saveSystemConfig);
+        btnCopyPix.addEventListener('click', copyPixKey);
+        
+        // NOVOS EVENT LISTENERS PARA AS NOVAS FUNCIONALIDADES
+        btnAuditReport.addEventListener('click', generateAuditReport);
+        btnExpenseReport.addEventListener('click', generateExpenseReport);
+        
+        // Fechar modais
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal') && e.target.id !== 'token-setup-modal') {
                 e.target.style.display = 'none';
+                if (activeCountdown) {
+                    clearInterval(activeCountdown);
+                    activeCountdown = null;
+                }
             }
         });
         
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', function() {
                 this.closest('.modal').style.display = 'none';
+                if (activeCountdown) {
+                    clearInterval(activeCountdown);
+                    activeCountdown = null;
+                }
             });
         });
         
@@ -1478,7 +1933,590 @@
                 loadRaffles();
             }
         });
+
+        // Iniciar verificação automática de reservas expiradas
+        startAutoExpiredCheck();
     });
+
+    // FUNÇÃO PARA VERIFICAÇÃO AUTOMÁTICA DE RESERVAS EXPIRADAS
+    function startAutoExpiredCheck() {
+        if (autoCheckExpiredInterval) {
+            clearInterval(autoCheckExpiredInterval);
+        }
+        
+        autoCheckExpiredInterval = setInterval(() => {
+            if (raffles.length > 0) {
+                checkAndCancelExpiredReservations();
+            }
+        }, 5 * 60 * 1000);
+    }
+
+    // FUNÇÃO PARA VERIFICAR E CANCELAR RESERVAS EXPIRADAS
+    async function checkAndCancelExpiredReservations() {
+        try {
+            console.log("Verificando reservas expiradas...");
+            
+            for (const raffle of raffles) {
+                if (raffle.status === 'completed' || !raffle.purchases) continue;
+                
+                const purchases = raffle.purchases;
+                const expiredNumbers = [];
+                const purchaseIdsToCancel = new Set();
+                
+                // Verificar cada compra pendente
+                for (const [number, purchaseData] of Object.entries(purchases)) {
+                    if (purchaseData.status === 'pending' && purchaseData.expiresAt) {
+                        const now = new Date();
+                        let expirationDate;
+                        
+                        if (purchaseData.expiresAt.toDate) {
+                            expirationDate = purchaseData.expiresAt.toDate();
+                        } else if (purchaseData.expiresAt.seconds) {
+                            expirationDate = new Date(purchaseData.expiresAt.seconds * 1000);
+                        } else {
+                            expirationDate = new Date(purchaseData.expiresAt);
+                        }
+                        
+                        if (now > expirationDate) {
+                            expiredNumbers.push(parseInt(number));
+                            purchaseIdsToCancel.add(purchaseData.purchaseId);
+                        }
+                    }
+                }
+                
+                // Cancelar reservas expiradas
+                if (expiredNumbers.length > 0) {
+                    console.log(`Cancelando ${expiredNumbers.length} cotas expiradas na rifa ${raffle.id}`);
+                    
+                    for (const purchaseId of purchaseIdsToCancel) {
+                        await cancelExpiredReservation(purchaseId, raffle.id, expiredNumbers);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Erro na verificação automática de reservas expiradas:", error);
+        }
+    }
+
+    // FUNÇÃO PARA CANCELAR RESERVA EXPIRADA
+    async function cancelExpiredReservation(purchaseId, raffleId, numbers) {
+        try {
+            await db.collection("purchases").doc(purchaseId).update({
+                status: 'cancelled',
+                cancelledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                cancellationReason: 'expired'
+            });
+            
+            const updates = {};
+            numbers.forEach(number => {
+                updates[`purchases.${number}`] = firebase.firestore.FieldValue.delete();
+            });
+            
+            await db.collection("raffles").doc(raffleId).update(updates);
+            
+            console.log(`Reserva ${purchaseId} cancelada automaticamente por expiração`);
+            
+            loadRaffles();
+            
+        } catch (error) {
+            console.error("Erro ao cancelar reserva expirada:", error);
+        }
+    }
+
+    // FUNÇÕES PARA AS NOVAS FUNCIONALIDADES
+
+    function loadSystemConfig() {
+        return db.collection("systemConfig").doc("settings").get()
+            .then(doc => {
+                if (doc.exists) {
+                    systemConfig = doc.data();
+                    
+                    // Preencher formulário administrativo
+                    if (userIsAdmin && currentAdminUserId) {
+                        pixKeyInput.value = systemConfig.pixKey || '';
+                        countdownEnabledCheckbox.checked = systemConfig.countdownEnabled || false;
+                        countdownHoursGroup.style.display = systemConfig.countdownEnabled ? 'block' : 'none';
+                        countdownHoursInput.value = systemConfig.countdownHours || 24;
+                        selectionMethodSelect.value = systemConfig.selectionMethod || 'manual';
+                    }
+                }
+                return systemConfig;
+            })
+            .catch(error => {
+                console.error("Erro ao carregar configurações:", error);
+                return systemConfig;
+            });
+    }
+
+    function saveSystemConfig() {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Acesso não autorizado', 'error');
+            return;
+        }
+        
+        const configData = {
+            pixKey: pixKeyInput.value.trim(),
+            countdownEnabled: countdownEnabledCheckbox.checked,
+            countdownHours: parseInt(countdownHoursInput.value) || 24,
+            selectionMethod: selectionMethodSelect.value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        db.collection("systemConfig").doc("settings").set(configData, { merge: true })
+            .then(() => {
+                systemConfig = configData;
+                showToast('Configurações do sistema salvas!', 'success');
+                loadRaffles(); // Recarregar as rifas para aplicar as novas configurações
+            })
+            .catch(error => {
+                console.error("Erro ao salvar configurações:", error);
+                showToast('Erro ao salvar configurações', 'error');
+            });
+    }
+
+    // FUNÇÃO MELHORADA PARA CONTAGEM REGRESSIVA
+    function startCountdownFromExpiration(expiresAtTimestamp) {
+        if (activeCountdown) {
+            clearInterval(activeCountdown);
+        }
+        
+        let expirationDate;
+        if (expiresAtTimestamp && expiresAtTimestamp.toDate) {
+            expirationDate = expiresAtTimestamp.toDate();
+        } else if (expiresAtTimestamp && expiresAtTimestamp.seconds) {
+            expirationDate = new Date(expiresAtTimestamp.seconds * 1000);
+        } else if (expiresAtTimestamp instanceof Date) {
+            expirationDate = expiresAtTimestamp;
+        } else if (expiresAtTimestamp) {
+            expirationDate = new Date(expiresAtTimestamp);
+        } else {
+            let countdownHours = 24;
+            if (systemConfig && systemConfig.countdownEnabled && systemConfig.countdownHours) {
+                countdownHours = systemConfig.countdownHours;
+            }
+            expirationDate = new Date(Date.now() + countdownHours * 60 * 60 * 1000);
+        }
+        
+        currentExpiresAt = expirationDate;
+        
+        function updateCountdown() {
+            const now = new Date();
+            const timeRemaining = expirationDate - now;
+            
+            if (timeRemaining <= 0) {
+                clearInterval(activeCountdown);
+                countdownTimer.textContent = "EXPIRADO";
+                countdownTimer.style.color = "var(--danger)";
+                return;
+            }
+            
+            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            
+            countdownTimer.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+            if (hours < 1) {
+                countdownTimer.style.color = "var(--danger)";
+            } else if (hours < 6) {
+                countdownTimer.style.color = "var(--warning)";
+            } else {
+                countdownTimer.style.color = "var(--success)";
+            }
+        }
+        
+        updateCountdown();
+        activeCountdown = setInterval(updateCountdown, 1000);
+    }
+
+    // FUNÇÃO PARA CALCULAR TEMPO RESTANTE PARA EXIBIÇÃO ESTÁTICA
+    function calculateTimeRemaining(expiresAtTimestamp) {
+        let expirationDate;
+        if (expiresAtTimestamp && expiresAtTimestamp.toDate) {
+            expirationDate = expiresAtTimestamp.toDate();
+        } else if (expiresAtTimestamp && expiresAtTimestamp.seconds) {
+            expirationDate = new Date(expiresAtTimestamp.seconds * 1000);
+        } else if (expiresAtTimestamp instanceof Date) {
+            expirationDate = expiresAtTimestamp;
+        } else if (expiresAtTimestamp) {
+            expirationDate = new Date(expiresAtTimestamp);
+        } else {
+            let countdownHours = 24;
+            if (systemConfig && systemConfig.countdownEnabled && systemConfig.countdownHours) {
+                countdownHours = systemConfig.countdownHours;
+            }
+            return `${countdownHours.toString().padStart(2, '0')}:00:00`;
+        }
+        
+        const now = new Date();
+        const timeRemaining = expirationDate - now;
+        
+        if (timeRemaining <= 0) {
+            return "EXPIRADO";
+        }
+        
+        const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function copyPixKey() {
+        const textToCopy = systemConfig.pixKey;
+        if (!textToCopy) {
+            showToast('Nenhuma chave PIX configurada', 'error');
+            return;
+        }
+        
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                showToast('Chave PIX copiada!', 'success');
+            })
+            .catch(err => {
+                showToast('Erro ao copiar chave PIX', 'error');
+            });
+    }
+
+    // FUNÇÕES PARA AS NOVAS IMPLEMENTAÇÕES
+
+    // Função para verificar limite por token
+    async function checkTokenLimit(raffle, token, additionalNumbers) {
+        if (!raffle.maxPerToken || raffle.maxPerToken <= 0) {
+            return true; // Sem limite
+        }
+        
+        try {
+            // Buscar todas as compras do token nesta rifa
+            const purchasesSnapshot = await db.collection("purchases")
+                .where("raffleId", "==", raffle.id)
+                .where("userId", "==", token)
+                .where("status", "in", ["confirmed", "pending"])
+                .get();
+            
+            let totalPurchased = 0;
+            purchasesSnapshot.forEach(doc => {
+                const purchase = doc.data();
+                totalPurchased += purchase.numbers ? purchase.numbers.length : 0;
+            });
+            
+            return (totalPurchased + additionalNumbers.length) <= raffle.maxPerToken;
+        } catch (error) {
+            console.error("Erro ao verificar limite por token:", error);
+            return false;
+        }
+    }
+
+    // Função para gerar relatório de auditoria
+    async function generateAuditReport() {
+        if (!userIsAdmin || !currentAdminUserId) {
+            showToast('Apenas administradores podem gerar relatórios de auditoria', 'error');
+            return;
+        }
+        
+        try {
+            showToast('Gerando relatório de auditoria...', 'info');
+            
+            // Buscar todas as rifas
+            const rafflesSnapshot = await db.collection("raffles").get();
+            const rafflesData = [];
+            rafflesSnapshot.forEach(doc => {
+                rafflesData.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // Buscar todas as compras
+            const purchasesSnapshot = await db.collection("purchases").get();
+            const purchasesData = [];
+            purchasesSnapshot.forEach(doc => {
+                const purchase = doc.data();
+                purchasesData.push({
+                    id: doc.id,
+                    ...purchase,
+                    reservedAt: purchase.reservedAt ? purchase.reservedAt.toDate() : null,
+                    confirmedAt: purchase.confirmedAt ? purchase.confirmedAt.toDate() : null,
+                    cancelledAt: purchase.cancelledAt ? purchase.cancelledAt.toDate() : null
+                });
+            });
+            
+            // Buscar todos os usuários
+            const usersSnapshot = await db.collection("users").get();
+            const usersData = [];
+            usersSnapshot.forEach(doc => {
+                usersData.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // Criar PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Cabeçalho
+            doc.setFontSize(20);
+            doc.text("RELATÓRIO DE AUDITORIA", 105, 15, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Data de geração: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}`, 105, 25, { align: 'center' });
+            
+            // Resumo
+            doc.setFontSize(14);
+            doc.text("RESUMO DO SISTEMA", 14, 40);
+            
+            doc.setFontSize(11);
+            let yPos = 50;
+            doc.text(`Total de Rifas: ${rafflesData.length}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Total de Usuários: ${usersData.length}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Total de Compras: ${purchasesData.length}`, 14, yPos);
+            yPos += 7;
+            
+            // Estatísticas de status
+            const confirmedPurchases = purchasesData.filter(p => p.status === 'confirmed').length;
+            const pendingPurchases = purchasesData.filter(p => p.status === 'pending').length;
+            const cancelledPurchases = purchasesData.filter(p => p.status === 'cancelled').length;
+            
+            doc.text(`Compras Confirmadas: ${confirmedPurchases}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Compras Pendentes: ${pendingPurchases}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Compras Canceladas: ${cancelledPurchases}`, 14, yPos);
+            yPos += 10;
+            
+            // Tabela de Rifas
+            doc.setFontSize(14);
+            doc.text("RIFAS CADASTRADAS", 14, yPos);
+            yPos += 10;
+            
+            const raffleTableData = rafflesData.map(raffle => [
+                raffle.id.substring(0, 8) + '...',
+                raffle.title,
+                raffle.status === 'completed' ? 'Sorteada' : 'Ativa',
+                raffle.totalNumbers,
+                `R$ ${raffle.price.toFixed(2)}`,
+                raffle.maxPerToken || 'Ilimitado',
+                raffle.selectionMode || 'both'
+            ]);
+            
+            doc.autoTable({
+                startY: yPos,
+                head: [['ID', 'Título', 'Status', 'Cotas', 'Valor', 'Max/Token', 'Modo Seleção']],
+                body: raffleTableData,
+                theme: 'grid',
+                headStyles: { fillColor: [44, 62, 80] },
+                margin: { left: 14 }
+            });
+            
+            yPos = doc.lastAutoTable.finalY + 10;
+            
+            // Verificar se há espaço para a próxima tabela
+            if (yPos > 250) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            // Tabela de Compras Recentes
+            doc.setFontSize(14);
+            doc.text("COMPRAS RECENTES", 14, yPos);
+            yPos += 10;
+            
+            // Ordenar compras por data (mais recente primeiro)
+            purchasesData.sort((a, b) => {
+                const dateA = a.reservedAt || new Date(0);
+                const dateB = b.reservedAt || new Date(0);
+                return dateB - dateA;
+            });
+            
+            // Pegar apenas as 20 compras mais recentes
+            const recentPurchases = purchasesData.slice(0, 20);
+            
+            const purchaseTableData = recentPurchases.map(purchase => {
+                const raffle = rafflesData.find(r => r.id === purchase.raffleId);
+                const raffleTitle = raffle ? raffle.title : 'Rifa não encontrada';
+                const date = purchase.reservedAt ? purchase.reservedAt.toLocaleDateString('pt-BR') : 'N/A';
+                
+                let statusText = '';
+                switch(purchase.status) {
+                    case 'confirmed': statusText = 'Confirmada'; break;
+                    case 'pending': statusText = 'Pendente'; break;
+                    case 'cancelled': statusText = 'Cancelada'; break;
+                    default: statusText = purchase.status;
+                }
+                
+                return [
+                    purchase.code,
+                    raffleTitle,
+                    purchase.userName || 'Anônimo',
+                    purchase.numbers ? purchase.numbers.length : 0,
+                    `R$ ${purchase.total ? purchase.total.toFixed(2) : '0.00'}`,
+                    statusText,
+                    date
+                ];
+            });
+            
+            doc.autoTable({
+                startY: yPos,
+                head: [['Código', 'Rifa', 'Cliente', 'Cotas', 'Valor', 'Status', 'Data']],
+                body: purchaseTableData,
+                theme: 'grid',
+                headStyles: { fillColor: [44, 62, 80] },
+                margin: { left: 14 }
+            });
+            
+            // Salvar o PDF
+            doc.save(`auditoria_${new Date().toISOString().split('T')[0]}.pdf`);
+            
+            showToast('Relatório de auditoria gerado com sucesso!', 'success');
+            
+        } catch (error) {
+            console.error("Erro ao gerar relatório de auditoria:", error);
+            showToast('Erro ao gerar relatório de auditoria', 'error');
+        }
+    }
+
+    // Função para gerar relatório de gastos
+    async function generateExpenseReport() {
+        if (!userToken) {
+            showToast('Token não configurado', 'error');
+            return;
+        }
+        
+        try {
+            showToast('Gerando relatório de gastos...', 'info');
+            
+            // Buscar as participações do token
+            const purchasesSnapshot = await db.collection("purchases")
+                .where("userId", "==", userToken)
+                .get();
+            
+            const purchases = [];
+            purchasesSnapshot.forEach(doc => {
+                const purchase = doc.data();
+                purchases.push({
+                    id: doc.id,
+                    ...purchase,
+                    reservedAt: purchase.reservedAt ? purchase.reservedAt.toDate() : null,
+                    confirmedAt: purchase.confirmedAt ? purchase.confirmedAt.toDate() : null
+                });
+            });
+            
+            if (purchases.length === 0) {
+                showToast('Nenhuma participação encontrada para gerar relatório', 'info');
+                return;
+            }
+            
+            // Buscar as rifas relacionadas
+            const raffleIds = [...new Set(purchases.map(p => p.raffleId))];
+            const rafflesData = [];
+            
+            for (const raffleId of raffleIds) {
+                const raffleDoc = await db.collection("raffles").doc(raffleId).get();
+                if (raffleDoc.exists) {
+                    rafflesData.push({ id: raffleDoc.id, ...raffleDoc.data() });
+                }
+            }
+            
+            // Criar PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Cabeçalho
+            doc.setFontSize(20);
+            doc.text("RELATÓRIO DE GASTOS", 105, 15, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Cliente: ${userName}`, 14, 25);
+            doc.text(`Token: ${userToken}`, 14, 32);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}`, 14, 39);
+            
+            // Resumo
+            doc.setFontSize(14);
+            doc.text("RESUMO FINANCEIRO", 14, 55);
+            
+            doc.setFontSize(11);
+            let yPos = 65;
+            
+            const totalPurchases = purchases.length;
+            const confirmedPurchases = purchases.filter(p => p.status === 'confirmed').length;
+            const pendingPurchases = purchases.filter(p => p.status === 'pending').length;
+            const cancelledPurchases = purchases.filter(p => p.status === 'cancelled').length;
+            
+            const totalSpent = purchases
+                .filter(p => p.status === 'confirmed')
+                .reduce((sum, p) => sum + (p.total || 0), 0);
+            
+            const pendingTotal = purchases
+                .filter(p => p.status === 'pending')
+                .reduce((sum, p) => sum + (p.total || 0), 0);
+            
+            doc.text(`Total de Participações: ${totalPurchases}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Participações Confirmadas: ${confirmedPurchases}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Participações Pendentes: ${pendingPurchases}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Participações Canceladas: ${cancelledPurchases}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Total Gasto: R$ ${totalSpent.toFixed(2)}`, 14, yPos);
+            yPos += 7;
+            doc.text(`Total Pendente: R$ ${pendingTotal.toFixed(2)}`, 14, yPos);
+            yPos += 10;
+            
+            // Tabela de Participações
+            doc.setFontSize(14);
+            doc.text("DETALHAMENTO DAS PARTICIPAÇÕES", 14, yPos);
+            yPos += 10;
+            
+            // Ordenar por data (mais recente primeiro)
+            purchases.sort((a, b) => {
+                const dateA = a.reservedAt || new Date(0);
+                const dateB = b.reservedAt || new Date(0);
+                return dateB - dateA;
+            });
+            
+            const purchaseTableData = purchases.map(purchase => {
+                const raffle = rafflesData.find(r => r.id === purchase.raffleId);
+                const raffleTitle = raffle ? raffle.title : 'Rifa não encontrada';
+                const date = purchase.reservedAt ? purchase.reservedAt.toLocaleDateString('pt-BR') : 'N/A';
+                
+                let statusText = '';
+                switch(purchase.status) {
+                    case 'confirmed': statusText = 'Confirmada'; break;
+                    case 'pending': statusText = 'Pendente'; break;
+                    case 'cancelled': statusText = 'Cancelada'; break;
+                    default: statusText = purchase.status;
+                }
+                
+                return [
+                    purchase.code,
+                    raffleTitle,
+                    purchase.numbers ? purchase.numbers.length : 0,
+                    `R$ ${purchase.total ? purchase.total.toFixed(2) : '0.00'}`,
+                    statusText,
+                    date
+                ];
+            });
+            
+            doc.autoTable({
+                startY: yPos,
+                head: [['Código', 'Rifa', 'Cotas', 'Valor', 'Status', 'Data']],
+                body: purchaseTableData,
+                theme: 'grid',
+                headStyles: { fillColor: [52, 152, 219] },
+                margin: { left: 14 }
+            });
+            
+            // Salvar o PDF
+            doc.save(`gastos_${userToken}_${new Date().toISOString().split('T')[0]}.pdf`);
+            
+            showToast('Relatório de gastos gerado com sucesso!', 'success');
+            
+        } catch (error) {
+            console.error("Erro ao gerar relatório de gastos:", error);
+            showToast('Erro ao gerar relatório de gastos', 'error');
+        }
+    }
+
+    // FUNÇÕES EXISTENTES MODIFICADAS
 
     function changeToken() {
         if (confirm('Deseja trocar de token? Isso irá remover seu token atual e você precisará configurar um novo token.')) {
@@ -1506,7 +2544,6 @@
             tokenModal.style.display = 'none';
             tokenSetupModal.style.display = 'flex';
             
-            // Limpar a lista de rifas
             rafflesContainer.innerHTML = `
                 <div style="text-align:center;padding:40px;">
                     <i class="fas fa-spinner fa-spin"></i> Carregando rifas...
@@ -1521,7 +2558,6 @@
 
     function loadWhatsappNumber() {
         if (!userIsAdmin && !currentAdminUserId) {
-            // Para usuários não-admin, tentar carregar do cache/localStorage primeiro
             const cachedNumber = localStorage.getItem('whatsappNumber');
             if (cachedNumber) {
                 whatsappNumber = cachedNumber;
@@ -1529,26 +2565,22 @@
             }
         }
         
-        // Buscar do Firestore
         db.collection("settings").doc("whatsapp").get()
             .then(doc => {
                 if (doc.exists && doc.data().number) {
                     whatsappNumber = doc.data().number;
                     localStorage.setItem('whatsappNumber', whatsappNumber);
                     
-                    // Se for admin, preencher o campo no painel
                     if (userIsAdmin && currentAdminUserId) {
                         whatsappNumberInput.value = whatsappNumber;
                     }
                 } else {
-                    // Número padrão de fallback
                     whatsappNumber = "5511999999999";
                     localStorage.setItem('whatsappNumber', whatsappNumber);
                 }
             })
             .catch(error => {
                 console.error("Erro ao carregar número do WhatsApp:", error);
-                // Número padrão de fallback
                 whatsappNumber = "5511999999999";
                 localStorage.setItem('whatsappNumber', whatsappNumber);
             });
@@ -1567,7 +2599,6 @@
             return;
         }
         
-        // Validar formato (apenas números)
         const cleanedNumber = number.replace(/\D/g, '');
         if (cleanedNumber.length < 11) {
             showToast('Número inválido. Formato: 5511999999999', 'error');
@@ -1596,7 +2627,6 @@
             userInfo.style.display = 'flex';
             userNameDisplay.textContent = user.displayName || user.email || "Usuário";
             
-            // Verificar se é admin
             checkAdminStatus(user.uid).then(isAdminUser => {
                 if (isAdminUser) {
                     adminInfo.style.display = 'block';
@@ -1605,7 +2635,8 @@
                     userIsAdmin = true;
                     localStorage.setItem('userIsAdmin', 'true');
                     loadPendingReservations();
-                    loadWhatsappNumber(); // Recarregar número para admin
+                    loadWhatsappNumber();
+                    loadSystemConfig();
                 } else {
                     adminInfo.style.display = 'none';
                     reservationsPanel.style.display = 'none';
@@ -1674,7 +2705,14 @@
             tokenDisplay.textContent = userToken;
             tokenModal.style.display = 'flex';
             showToast('Token criado com sucesso!', 'success');
-            loadRaffles();
+            loadSystemConfig()
+                .then(() => {
+                    loadRaffles();
+                })
+                .catch(error => {
+                    console.error("Erro ao carregar configurações, usando padrão", error);
+                    loadRaffles();
+                });
             loadWhatsappNumber();
         })
         .catch(error => {
@@ -1703,7 +2741,14 @@
                 
                 tokenSetupModal.style.display = 'none';
                 showToast('Token carregado! Bem-vindo!', 'success');
-                loadRaffles();
+                loadSystemConfig()
+                    .then(() => {
+                        loadRaffles();
+                    })
+                    .catch(error => {
+                        console.error("Erro ao carregar configurações, usando padrão", error);
+                        loadRaffles();
+                    });
                 loadWhatsappNumber();
             } else {
                 showToast('Token não encontrado.', 'error');
@@ -1791,6 +2836,15 @@
             const progress = (totalSold / raffle.totalNumbers) * 100;
             const isCompleted = raffle.status === 'completed';
             
+            // USAR CONFIGURAÇÃO INDIVIDUAL DA RIFA
+            // Se a rifa tiver configuração própria, usar ela, senão usar a configuração do sistema
+            const raffleSelectionMode = raffle.selectionMode || 'both';
+            const raffleMaxPerToken = raffle.maxPerToken || 0;
+            
+            // Remover qualquer regra global baseada em quantidade de cotas
+            const autoOnly = raffleSelectionMode === 'auto';
+            const needsModeSelector = raffleSelectionMode === 'both';
+            
             const card = document.createElement('div');
             card.className = 'raffle-card';
             card.dataset.id = raffle.id;
@@ -1841,21 +2895,50 @@
                             <span class="info-label">Prêmio instantâneo:</span>
                             <span class="info-value">${raffle.premiumNumbers && raffle.premiumNumbers.length > 0 ? 'Sim' : 'Não'}</span>
                         </div>
+                        ${raffleMaxPerToken > 0 ? `
+                        <div class="info-item">
+                            <span class="info-label">Max/token:</span>
+                            <span class="info-value">${raffleMaxPerToken}</span>
+                        </div>
+                        ` : ''}
                     </div>
                     
                     ${!isCompleted ? `
+                        ${autoOnly ? `
+                            <div class="auto-selection-info">
+                                <i class="fas fa-random"></i> Esta rifa utiliza seleção aleatória.
+                            </div>
+                        ` : ''}
+                        
+                        ${needsModeSelector ? `
+                            <div class="selection-mode-selector">
+                                <div class="mode-btn active" data-mode="manual" id="mode-manual-${raffle.id}">
+                                    <i class="fas fa-mouse-pointer"></i> Manual
+                                </div>
+                                <div class="mode-btn" data-mode="auto" id="mode-auto-${raffle.id}">
+                                    <i class="fas fa-random"></i> Aleatório
+                                </div>
+                            </div>
+                        ` : ''}
+                        
                         <div class="selection-controls">
                             <div class="quantity-selector">
                                 <button class="qty-btn" id="decrease-qty-${raffle.id}">-</button>
                                 <input type="number" class="qty-input" id="qty-input-${raffle.id}" value="1" min="1" max="${raffle.totalNumbers - totalSold}">
                                 <button class="qty-btn" id="increase-qty-${raffle.id}">+</button>
                             </div>
-                            <button class="btn-select-random" id="random-select-${raffle.id}">
-                                <i class="fas fa-random"></i> Aleatório
-                            </button>
+                            ${autoOnly ? `
+                                <button class="btn-select-random" id="random-select-${raffle.id}">
+                                    <i class="fas fa-random"></i> Selecionar Aleatoriamente
+                                </button>
+                            ` : `
+                                <button class="btn-select-random" id="random-select-${raffle.id}">
+                                    <i class="fas fa-random"></i> Aleatório
+                                </button>
+                            `}
                         </div>
                         
-                        <div class="numbers-grid" id="numbers-grid-${raffle.id}">
+                        <div class="numbers-grid ${autoOnly ? 'scrollable' : ''}" id="numbers-grid-${raffle.id}">
                             ${Array.from({length: raffle.totalNumbers}, (_, i) => {
                                 const number = i + 1;
                                 const purchase = raffle.purchases && raffle.purchases[number];
@@ -1877,14 +2960,11 @@
                                     className += 'number-available';
                                 }
                                 
-                                // REMOVIDO: Não mostrar indicação de cota premiada antes da compra
-                                // Apenas admins podem ver durante o desenvolvimento/teste
                                 if (raffle.premiumNumbers && raffle.premiumNumbers.includes(number)) {
                                     if (userIsAdmin) {
                                         className += ' number-premium';
                                         title += ' - Cota premiada (somente admin vê)';
                                     }
-                                    // Usuários normais não veem nenhuma indicação
                                 }
                                 
                                 return `
@@ -1980,30 +3060,83 @@
         
         let localSelectedNumbers = [];
         
-        numbersGrid.addEventListener('click', (e) => {
-            const numberItem = e.target.closest('.number-item');
-            if (!numberItem) return;
-            
-            if (numberItem.classList.contains('number-purchased') || 
-                numberItem.classList.contains('number-pending') ||
-                numberItem.classList.contains('number-cancelled')) {
-                showToast('Cota não disponível', 'error');
-                return;
+        // USAR CONFIGURAÇÃO INDIVIDUAL DA RIFA
+        const raffleSelectionMode = raffle.selectionMode || 'both';
+        const autoOnly = raffleSelectionMode === 'auto';
+        const needsModeSelector = raffleSelectionMode === 'both';
+        
+        // Se for autoOnly, não deve ter seletor de modo nem permitir seleção manual
+        if (autoOnly) {
+            // Garantir que não há seletor de modo visível
+            const modeSelector = document.querySelector(`#mode-manual-${raffleId}`);
+            if (modeSelector) {
+                modeSelector.parentElement.style.display = 'none';
             }
             
-            const number = parseInt(numberItem.dataset.number);
+            // Para seleção automática apenas, garantir que a grade seja rolável
+            numbersGrid.classList.add('scrollable');
             
-            if (numberItem.classList.contains('number-selected')) {
-                numberItem.classList.remove('number-selected');
-                localSelectedNumbers = localSelectedNumbers.filter(n => n !== number);
-            } else {
-                numberItem.classList.add('number-selected');
-                localSelectedNumbers.push(number);
+            // Desabilitar clique nos números individualmente
+            const numberItems = numbersGrid.querySelectorAll('.number-item');
+            numberItems.forEach(item => {
+                if (!item.classList.contains('number-purchased') && 
+                    !item.classList.contains('number-pending') &&
+                    !item.classList.contains('number-cancelled')) {
+                    item.style.pointerEvents = 'none';
+                }
+            });
+            
+            // Permitir rolagem
+            numbersGrid.style.pointerEvents = 'auto';
+        }
+        
+        if (needsModeSelector) {
+            const manualBtn = document.getElementById(`mode-manual-${raffleId}`);
+            const autoBtn = document.getElementById(`mode-auto-${raffleId}`);
+            
+            if (manualBtn && autoBtn) {
+                manualBtn.addEventListener('click', () => {
+                    manualBtn.classList.add('active');
+                    autoBtn.classList.remove('active');
+                    enableManualSelection(raffleId);
+                });
+                
+                autoBtn.addEventListener('click', () => {
+                    autoBtn.classList.add('active');
+                    manualBtn.classList.remove('active');
+                    enableAutoSelection(raffleId);
+                });
+                
+                // Iniciar no modo manual por padrão
+                enableManualSelection(raffleId);
             }
-            
-            purchaseBtn.disabled = localSelectedNumbers.length === 0;
-            selectedNumbers = localSelectedNumbers;
-        });
+        } else if (raffleSelectionMode === 'manual') {
+            // Para rifas com modo manual, permitir seleção manual normalmente
+            numbersGrid.addEventListener('click', (e) => {
+                const numberItem = e.target.closest('.number-item');
+                if (!numberItem) return;
+                
+                if (numberItem.classList.contains('number-purchased') || 
+                    numberItem.classList.contains('number-pending') ||
+                    numberItem.classList.contains('number-cancelled')) {
+                    showToast('Cota não disponível', 'error');
+                    return;
+                }
+                
+                const number = parseInt(numberItem.dataset.number);
+                
+                if (numberItem.classList.contains('number-selected')) {
+                    numberItem.classList.remove('number-selected');
+                    localSelectedNumbers = localSelectedNumbers.filter(n => n !== number);
+                } else {
+                    numberItem.classList.add('number-selected');
+                    localSelectedNumbers.push(number);
+                }
+                
+                purchaseBtn.disabled = localSelectedNumbers.length === 0;
+                selectedNumbers = localSelectedNumbers;
+            });
+        }
         
         decreaseBtn.addEventListener('click', () => {
             let value = parseInt(qtyInput.value);
@@ -2049,6 +3182,45 @@
             const purchasedNumbers = raffle.purchases ? Object.keys(raffle.purchases).map(Number) : [];
             const availableNumbers = allNumbers.filter(n => !purchasedNumbers.includes(n));
             
+            // Verificar e cancelar reservas expiradas antes de selecionar
+            const expiredNumbers = availableNumbers.filter(number => {
+                const purchase = raffle.purchases && raffle.purchases[number];
+                if (purchase && purchase.status === 'pending' && purchase.expiresAt) {
+                    const now = new Date();
+                    let expirationDate;
+                    
+                    if (purchase.expiresAt.toDate) {
+                        expirationDate = purchase.expiresAt.toDate();
+                    } else if (purchase.expiresAt.seconds) {
+                        expirationDate = new Date(purchase.expiresAt.seconds * 1000);
+                    } else {
+                        expirationDate = new Date(purchase.expiresAt);
+                    }
+                    
+                    return now > expirationDate;
+                }
+                return false;
+            });
+            
+            // Se houver números expirados, cancelá-los
+            if (expiredNumbers.length > 0) {
+                expiredNumbers.forEach(number => {
+                    const purchase = raffle.purchases[number];
+                    if (purchase && purchase.purchaseId) {
+                        cancelExpiredReservation(purchase.purchaseId, raffle.id, [number]);
+                    }
+                });
+                
+                // Atualizar lista de números disponíveis
+                const updatedAvailableNumbers = availableNumbers.filter(n => !expiredNumbers.includes(n));
+                availableNumbers.splice(0, availableNumbers.length, ...updatedAvailableNumbers);
+            }
+            
+            if (availableNumbers.length === 0) {
+                showToast('Nenhuma cota disponível', 'error');
+                return;
+            }
+            
             const shuffled = [...availableNumbers].sort(() => 0.5 - Math.random());
             const randomNumbers = shuffled.slice(0, qty);
             
@@ -2072,9 +3244,51 @@
             selectedNumbers = localSelectedNumbers;
         });
         
-        purchaseBtn.addEventListener('click', () => {
+        purchaseBtn.addEventListener('click', async () => {
             if (localSelectedNumbers.length === 0) {
                 showToast('Selecione ao menos uma cota', 'error');
+                return;
+            }
+            
+            // Verificar limite por token
+            if (raffle.maxPerToken && raffle.maxPerToken > 0) {
+                const withinLimit = await checkTokenLimit(raffle, userToken, localSelectedNumbers);
+                if (!withinLimit) {
+                    showToast(`Limite de ${raffle.maxPerToken} cotas por token nesta rifa. Você já atingiu ou excedeu o limite.`, 'error');
+                    return;
+                }
+            }
+            
+            // Verificar se há reservas expiradas antes de processar
+            const expiredNumbers = localSelectedNumbers.filter(number => {
+                const purchase = raffle.purchases && raffle.purchases[number];
+                if (purchase && purchase.status === 'pending' && purchase.expiresAt) {
+                    const now = new Date();
+                    let expirationDate;
+                    
+                    if (purchase.expiresAt.toDate) {
+                        expirationDate = purchase.expiresAt.toDate();
+                    } else if (purchase.expiresAt.seconds) {
+                        expirationDate = new Date(purchase.expiresAt.seconds * 1000);
+                    } else {
+                        expirationDate = new Date(purchase.expiresAt);
+                    }
+                    
+                    return now > expirationDate;
+                }
+                return false;
+            });
+            
+            if (expiredNumbers.length > 0) {
+                // Cancelar reservas expiradas primeiro
+                expiredNumbers.forEach(number => {
+                    const purchase = raffle.purchases[number];
+                    if (purchase && purchase.purchaseId) {
+                        cancelExpiredReservation(purchase.purchaseId, raffle.id, [number]);
+                    }
+                });
+                
+                showToast(`Canceladas ${expiredNumbers.length} reserva(s) expirada(s). Tente novamente.`, 'info');
                 return;
             }
             
@@ -2090,7 +3304,81 @@
         });
     }
 
-    function processReservation(raffle, numbers) {
+    function enableManualSelection(raffleId) {
+        const numbersGrid = document.getElementById(`numbers-grid-${raffleId}`);
+        const manualBtn = document.getElementById(`mode-manual-${raffleId}`);
+        
+        // Habilitar clique nos números
+        numbersGrid.style.pointerEvents = 'auto';
+        
+        const numberItems = numbersGrid.querySelectorAll('.number-item');
+        numberItems.forEach(item => {
+            if (!item.classList.contains('number-purchased') && 
+                !item.classList.contains('number-pending') &&
+                !item.classList.contains('number-cancelled')) {
+                item.style.pointerEvents = 'auto';
+            }
+        });
+        
+        // Adicionar event listener para seleção manual
+        const handleNumberClick = (e) => {
+            const numberItem = e.target.closest('.number-item');
+            if (!numberItem) return;
+            
+            if (numberItem.classList.contains('number-purchased') || 
+                numberItem.classList.contains('number-pending') ||
+                numberItem.classList.contains('number-cancelled')) {
+                showToast('Cota não disponível', 'error');
+                return;
+            }
+            
+            const number = parseInt(numberItem.dataset.number);
+            
+            if (numberItem.classList.contains('number-selected')) {
+                numberItem.classList.remove('number-selected');
+            } else {
+                numberItem.classList.add('number-selected');
+            }
+        };
+        
+        numbersGrid.addEventListener('click', handleNumberClick);
+        
+        // Atualizar texto do botão
+        if (manualBtn) {
+            manualBtn.innerHTML = '<i class="fas fa-mouse-pointer"></i> Manual (Ativo)';
+        }
+    }
+
+    function enableAutoSelection(raffleId) {
+        const numbersGrid = document.getElementById(`numbers-grid-${raffleId}`);
+        const autoBtn = document.getElementById(`mode-auto-${raffleId}`);
+        
+        // Manter a grade rolável
+        numbersGrid.classList.add('scrollable');
+        
+        // Desabilitar clique nos números individualmente
+        const numberItems = numbersGrid.querySelectorAll('.number-item');
+        numberItems.forEach(item => {
+            item.style.pointerEvents = 'none';
+        });
+        
+        // Permitir rolagem no container
+        numbersGrid.style.pointerEvents = 'auto';
+        
+        // Limpar seleções manuais
+        const selectedNumbers = numbersGrid.querySelectorAll('.number-selected');
+        selectedNumbers.forEach(num => {
+            num.classList.remove('number-selected');
+        });
+        
+        // Atualizar texto do botão
+        if (autoBtn) {
+            autoBtn.innerHTML = '<i class="fas fa-random"></i> Aleatório (Ativo)';
+        }
+    }
+
+    // FUNÇÃO MELHORADA PARA PROCESSAR RESERVA
+    async function processReservation(raffle, numbers) {
         if (isProcessingReservation) {
             showToast('Processando reserva anterior...', 'info');
             return;
@@ -2115,6 +3403,12 @@
         
         const total = raffle.price * numbers.length;
         
+        let countdownHours = 24;
+        if (systemConfig && systemConfig.countdownEnabled && systemConfig.countdownHours) {
+            countdownHours = systemConfig.countdownHours;
+        }
+        const expiresAt = new Date(Date.now() + countdownHours * 60 * 60 * 1000);
+        
         purchaseTitle.textContent = raffle.title;
         purchaseNumbers.textContent = numbers.join(', ');
         purchaseQuantity.textContent = numbers.length;
@@ -2122,16 +3416,22 @@
         purchaseTotal.textContent = `R$ ${total.toFixed(2)}`;
         purchaseCode.textContent = code;
         
-        // Verificar se temos o número do WhatsApp
-        if (!whatsappNumber) {
-            loadWhatsappNumber();
-            showToast('Carregando informações...', 'info');
-            setTimeout(() => {
-                setupWhatsappButton(raffle, numbers, code, total);
-            }, 1000);
+        if (systemConfig.pixKey) {
+            pixKeyDisplay.textContent = systemConfig.pixKey;
+            pixAmount.textContent = `R$ ${total.toFixed(2)}`;
+            pixInfo.style.display = 'block';
         } else {
-            setupWhatsappButton(raffle, numbers, code, total);
+            pixInfo.style.display = 'none';
         }
+        
+        if (systemConfig.countdownEnabled) {
+            paymentCountdown.style.display = 'block';
+            startCountdownFromExpiration(expiresAt);
+        } else {
+            paymentCountdown.style.display = 'none';
+        }
+        
+        setupWhatsappButton(raffle, numbers, code, total);
         
         purchaseModal.style.display = 'flex';
         
@@ -2144,7 +3444,7 @@
             total: total,
             status: 'pending',
             reservedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            expiresAt: expiresAt
         };
         
         db.collection("purchases").add(reservationData)
@@ -2157,7 +3457,8 @@
                     userName: userName,
                     code: code,
                     status: 'pending',
-                    reservedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    reservedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: expiresAt
                 };
             });
             
@@ -2166,7 +3467,6 @@
         .then(() => {
             showToast('Reserva realizada! Envie o comprovante.', 'success');
             
-            // Verificação interna (não revelada ao usuário)
             const premiumNumbersInSelection = numbers.filter(n => 
                 raffle.premiumNumbers && raffle.premiumNumbers.includes(n)
             );
@@ -2193,7 +3493,7 @@
             `Comprovante de pagamento:`
         );
         
-        const formattedNumber = whatsappNumber.replace(/\D/g, '');
+        const formattedNumber = whatsappNumber ? whatsappNumber.replace(/\D/g, '') : "5511999999999";
         btnWhatsapp.onclick = () => {
             window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
         };
@@ -2247,6 +3547,7 @@
             showToast('Agora você é administrador!', 'success');
             loadPendingReservations();
             loadWhatsappNumber();
+            loadSystemConfig();
         })
         .catch(error => {
             console.error("Erro ao tornar admin:", error);
@@ -2269,6 +3570,7 @@
                 if (adminPanel.style.display === 'block') {
                     loadPendingReservations();
                     loadWhatsappNumber();
+                    loadSystemConfig();
                 }
             } else {
                 showToast('Você não tem permissões de administrador', 'error');
@@ -2303,6 +3605,10 @@
             document.getElementById('total-numbers').value = raffle.totalNumbers || '';
             document.getElementById('raffle-image').value = raffle.image || '';
             
+            // Preencher novos campos
+            maxPerTokenInput.value = raffle.maxPerToken || 0;
+            raffleSelectionModeSelect.value = raffle.selectionMode || 'both';
+            
             premiumNumbers = raffle.premiumNumbers || [];
             updatePremiumNumbersList();
             
@@ -2327,6 +3633,8 @@
         document.getElementById('raffle-price').value = '';
         document.getElementById('total-numbers').value = '100';
         document.getElementById('raffle-image').value = '';
+        maxPerTokenInput.value = 0;
+        raffleSelectionModeSelect.value = 'both';
         premiumNumbers = [];
         updatePremiumNumbersList();
         winnerInputSection.style.display = 'none';
@@ -2384,6 +3692,8 @@
         const price = parseFloat(document.getElementById('raffle-price').value);
         const totalNumbers = parseInt(document.getElementById('total-numbers').value);
         const image = document.getElementById('raffle-image').value;
+        const maxPerToken = parseInt(maxPerTokenInput.value) || 0;
+        const selectionMode = raffleSelectionModeSelect.value;
         
         if (!title || !description || !price || !totalNumbers) {
             showToast('Preencha todos os campos obrigatórios', 'error');
@@ -2407,6 +3717,8 @@
             description,
             price,
             totalNumbers,
+            maxPerToken,
+            selectionMode,
             premiumNumbers,
             image,
             status: 'active',
@@ -2432,6 +3744,8 @@
                 description,
                 price,
                 totalNumbers,
+                maxPerToken,
+                selectionMode,
                 premiumNumbers,
                 image
             })
@@ -2478,6 +3792,7 @@
                         localStorage.setItem('userIsAdmin', 'true');
                         loadPendingReservations();
                         loadWhatsappNumber();
+                        loadSystemConfig();
                     } else {
                         showToast('Login realizado, mas não é admin', 'info');
                     }
@@ -2554,7 +3869,6 @@
         participationContent.style.display = 'none';
         noParticipations.style.display = 'none';
         
-        // Buscar todas as compras do usuário
         db.collection("purchases")
             .where("userId", "==", userToken)
             .get()
@@ -2571,14 +3885,12 @@
                     participations.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // Ordenar por data (mais recente primeiro)
                 participations.sort((a, b) => {
                     const dateA = a.reservedAt ? a.reservedAt.toDate() : new Date(0);
                     const dateB = b.reservedAt ? b.reservedAt.toDate() : new Date(0);
                     return dateB - dateA;
                 });
                 
-                // Buscar informações das rifas
                 const rafflePromises = participations.map(participation => 
                     db.collection("raffles").doc(participation.raffleId).get()
                 );
@@ -2627,18 +3939,20 @@
             const purchase = item.purchase;
             const raffle = item.raffle;
             
-            // Verificar se há números premiados nesta compra
             const premiumNumbers = raffle.premiumNumbers || [];
             const premiumNumbersInPurchase = purchase.numbers.filter(n => premiumNumbers.includes(n));
             
-            // Verificar se o usuário é vencedor da rifa
             const isWinner = raffle.winningNumber && purchase.numbers.includes(raffle.winningNumber);
             
-            // Verificar se há números premiados que o usuário ganhou
             const premiumWinners = raffle.premiumWinners || {};
             const userPremiumWins = purchase.numbers.filter(n => 
                 premiumWinners[n] && premiumWinners[n].userId === userToken
             );
+            
+            const timeRemaining = purchase.expiresAt ? calculateTimeRemaining(purchase.expiresAt) : 
+                (systemConfig && systemConfig.countdownEnabled && systemConfig.countdownHours ? 
+                    `${systemConfig.countdownHours.toString().padStart(2, '0')}:00:00` : "24:00:00");
+            const isExpired = timeRemaining === "EXPIRADO";
             
             const participationItem = document.createElement('div');
             participationItem.className = 'participation-item';
@@ -2672,6 +3986,13 @@
                     <div><strong>Código:</strong> ${purchase.code}</div>
                     <div><strong>Valor total:</strong> R$ ${purchase.total ? purchase.total.toFixed(2) : '0.00'}</div>
                     <div><strong>Quantidade de cotas:</strong> ${purchase.numbers.length}</div>
+                    ${purchase.status === 'pending' ? `
+                        <div class="time-info">
+                            <i class="fas fa-clock"></i>
+                            <span>Tempo restante: ${timeRemaining}</span>
+                            ${isExpired ? '<span class="expired-badge">EXPIRADO</span>' : ''}
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <div><strong>Suas cotas:</strong></div>
@@ -2714,11 +4035,22 @@
                     <div style="margin-top:10px;padding:10px;background:rgba(52,152,219,0.1);border-radius:6px;">
                         <strong>⏰ RESERVA PENDENTE</strong>
                         <p>Envie o comprovante de pagamento para confirmar suas cotas.</p>
+                        <button class="btn-pay-pending" data-purchase-id="${purchase.id}" data-raffle-id="${raffle.id}">
+                            <i class="fas fa-credit-card"></i> Pagar Agora
+                        </button>
                     </div>
                 ` : ''}
             `;
             
             participationList.appendChild(participationItem);
+        });
+        
+        participationList.querySelectorAll('.btn-pay-pending').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const purchaseId = e.target.closest('button').dataset.purchaseId;
+                const raffleId = e.target.closest('button').dataset.raffleId;
+                openPaymentForPendingReservation(purchaseId, raffleId);
+            });
         });
         
         participationLoading.style.display = 'none';
@@ -2776,9 +4108,42 @@
                         });
                     });
                     
+                    const now = new Date();
+                    let hasExpired = false;
+                    
+                    for (const reservation of reservationsArray) {
+                        if (reservation.expiresAt) {
+                            let expirationDate;
+                            
+                                                        if (reservation.expiresAt.toDate) {
+                                expirationDate = reservation.expiresAt.toDate();
+                            } else if (reservation.expiresAt.seconds) {
+                                expirationDate = new Date(reservation.expiresAt.seconds * 1000);
+                            } else {
+                                expirationDate = new Date(reservation.expiresAt);
+                            }
+                            
+                            if (now > expirationDate) {
+                                hasExpired = true;
+                                cancelExpiredReservation(reservation.id, reservation.raffleId, reservation.numbers);
+                            }
+                        }
+                    }
+                    
+                    // Se houve cancelamentos, recarregar após um breve delay
+                    if (hasExpired) {
+                        setTimeout(() => loadPendingReservations(), 2000);
+                        return;
+                    }
+                    
                     reservationsArray.sort((a, b) => b.timestamp - a.timestamp);
                     
                     reservationsArray.forEach(reservation => {
+                        const timeRemaining = reservation.expiresAt ? calculateTimeRemaining(reservation.expiresAt) : 
+                            (systemConfig && systemConfig.countdownEnabled && systemConfig.countdownHours ? 
+                                `${systemConfig.countdownHours.toString().padStart(2, '0')}:00:00` : "24:00:00");
+                        const isExpired = timeRemaining === "EXPIRADO";
+                        
                         const reservationItem = document.createElement('div');
                         reservationItem.className = 'reservation-item';
                         reservationItem.innerHTML = `
@@ -2790,6 +4155,7 @@
                             <div><strong>Código:</strong> ${reservation.code || 'N/A'}</div>
                             <div><strong>Total:</strong> R$ ${reservation.total ? reservation.total.toFixed(2) : '0.00'}</div>
                             <div><strong>Token:</strong> ${reservation.userId || 'N/A'}</div>
+                            <div><strong>Tempo restante:</strong> ${timeRemaining} ${isExpired ? '<span class="expired-badge" style="font-size:0.7rem;padding:2px 6px;">EXPIRADO</span>' : ''}</div>
                             <div style="margin:8px 0;"><strong>Cotas:</strong> ${reservation.numbers ? reservation.numbers.join(', ') : 'Nenhuma'}</div>
                             <div class="reservation-actions">
                                 <button class="btn-confirm" data-id="${reservation.id}" data-raffle="${reservation.raffleId}">
@@ -2851,7 +4217,6 @@
                     completedRaffles.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // Ordenar por data (mais antigas primeiro)
                 completedRaffles.sort((a, b) => {
                     const dateA = a.drawDate ? a.drawDate.toDate() : new Date(0);
                     const dateB = b.drawDate ? b.drawDate.toDate() : new Date(0);
@@ -2880,7 +4245,6 @@
                     completedRafflesList.appendChild(raffleItem);
                 });
                 
-                // Adicionar event listeners para os botões de exclusão
                 completedRafflesList.querySelectorAll('.btn-delete-raffle').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const raffleId = e.target.closest('button').dataset.id;
@@ -2905,19 +4269,16 @@
             return;
         }
         
-        // Primeiro, buscar todas as compras associadas a esta rifa
         db.collection("purchases")
             .where("raffleId", "==", raffleId)
             .get()
             .then(snapshot => {
                 const batch = db.batch();
                 
-                // Excluir todas as compras associadas
                 snapshot.forEach(doc => {
                     batch.delete(doc.ref);
                 });
                 
-                // Excluir a rifa
                 const raffleRef = db.collection("raffles").doc(raffleId);
                 batch.delete(raffleRef);
                 
@@ -2925,8 +4286,8 @@
             })
             .then(() => {
                 showToast(`Rifa "${raffleTitle}" excluída com sucesso!`, 'success');
-                loadCompletedRaffles(); // Recarregar a lista
-                loadRaffles(); // Recarregar a lista principal de rifas
+                loadCompletedRaffles();
+                loadRaffles();
             })
             .catch(error => {
                 console.error("Erro ao excluir rifa:", error);
@@ -3105,9 +4466,87 @@
             showToast('Erro ao definir vencedor', 'error');
         });
     }
+
+    function openPaymentForPendingReservation(purchaseId, raffleId) {
+        participationModal.style.display = 'none';
+        
+        db.collection("purchases").doc(purchaseId).get()
+            .then(doc => {
+                if (!doc.exists) {
+                    throw new Error("Reserva não encontrada");
+                }
+                
+                const purchase = doc.data();
+                
+                if (purchase.expiresAt) {
+                    const now = new Date();
+                    let expirationDate;
+                    
+                    if (purchase.expiresAt.toDate) {
+                        expirationDate = purchase.expiresAt.toDate();
+                    } else if (purchase.expiresAt.seconds) {
+                        expirationDate = new Date(purchase.expiresAt.seconds * 1000);
+                    } else {
+                        expirationDate = new Date(purchase.expiresAt);
+                    }
+                    
+                    if (now > expirationDate) {
+                        cancelExpiredReservation(purchaseId, raffleId, purchase.numbers);
+                        showToast('Reserva expirada. Tente novamente.', 'error');
+                        return;
+                    }
+                }
+                
+                return db.collection("raffles").doc(raffleId).get()
+                    .then(raffleDoc => {
+                        if (!raffleDoc.exists) {
+                            throw new Error("Rifa não encontrada");
+                        }
+                        
+                        const raffle = { id: raffleDoc.id, ...raffleDoc.data() };
+                        
+                        purchaseTitle.textContent = raffle.title;
+                        purchaseNumbers.textContent = purchase.numbers.join(', ');
+                        purchaseQuantity.textContent = purchase.numbers.length;
+                        purchasePrice.textContent = `R$ ${raffle.price.toFixed(2)}`;
+                        purchaseTotal.textContent = `R$ ${purchase.total.toFixed(2)}`;
+                        purchaseCode.textContent = purchase.code;
+                        
+                        if (systemConfig.pixKey) {
+                            pixKeyDisplay.textContent = systemConfig.pixKey;
+                            pixAmount.textContent = `R$ ${purchase.total.toFixed(2)}`;
+                            pixInfo.style.display = 'block';
+                        } else {
+                            pixInfo.style.display = 'none';
+                        }
+                        
+                        if (systemConfig.countdownEnabled && purchase.expiresAt) {
+                            paymentCountdown.style.display = 'block';
+                            startCountdownFromExpiration(purchase.expiresAt);
+                        } else {
+                            paymentCountdown.style.display = 'none';
+                        }
+                        
+                        const message = encodeURIComponent(
+                            `Olá! Segue comprovante para a reserva na rifa "${raffle.title}".\n` +
+                            `Código: ${purchase.code}\n` +
+                            `Cotas: ${purchase.numbers.join(', ')}\n` +
+                            `Total: R$ ${purchase.total.toFixed(2)}`
+                        );
+                        
+                        const formattedNumber = whatsappNumber ? whatsappNumber.replace(/\D/g, '') : "5511999999999";
+                        btnWhatsapp.onclick = () => {
+                            window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
+                        };
+                        
+                        purchaseModal.style.display = 'flex';
+                    });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar reserva:", error);
+                showToast('Erro ao carregar reserva', 'error');
+            });
+    }
 </script>
 </body>
 </html>
-
-
-
