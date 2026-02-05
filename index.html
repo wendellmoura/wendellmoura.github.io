@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema de Rifas Online</title>
+    <title>Sistema de Ações Online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Adicionando jsPDF para geração de PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -104,7 +104,7 @@
             font-size: 1rem;
         }
 
-        .raffles-grid {
+        .actions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 16px;
@@ -112,7 +112,7 @@
         }
 
         @media (max-width: 768px) {
-            .raffles-grid {
+            .actions-grid {
                 grid-template-columns: 1fr;
             }
             
@@ -127,7 +127,7 @@
         }
 
         @media (max-width: 480px) {
-            .raffles-grid {
+            .actions-grid {
                 gap: 12px;
             }
             
@@ -136,7 +136,7 @@
             }
         }
 
-        .raffle-card {
+        .action-card {
             background-color: var(--card-bg);
             border-radius: 12px;
             overflow: hidden;
@@ -148,11 +148,11 @@
             transition: transform 0.2s;
         }
 
-        .raffle-card:hover {
+        .action-card:hover {
             transform: translateY(-2px);
         }
 
-        .raffle-image {
+        .action-image {
             height: 160px;
             display: flex;
             align-items: center;
@@ -162,7 +162,7 @@
             background: linear-gradient(135deg, #f8f9fa 0%, #e0e7ed 100%);
         }
 
-        .raffle-image img {
+        .action-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -219,7 +219,7 @@
             flex-grow: 1;
         }
 
-        .raffle-info {
+        .action-info {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
@@ -262,6 +262,7 @@
             cursor: pointer;
             user-select: none;
             border: 2px solid transparent;
+            position: relative;
         }
 
         .number-available {
@@ -317,6 +318,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .qty-btn {
@@ -333,8 +335,13 @@
             font-size: 1rem;
         }
 
+        .quick-qty-btn {
+            padding: 6px 10px;
+            width: auto;
+        }
+
         .qty-input {
-            width: 40px;
+            width: 50px;
             text-align: center;
             border: 1px solid var(--border);
             background-color: var(--body-bg);
@@ -396,6 +403,31 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
+        .legend-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .legend-green { background-color: var(--available-color); }
+        .legend-orange { background-color: var(--pending-color); }
+        .legend-blue { background-color: var(--purchased-color); }
 
         .filter-buttons {
             display: flex;
@@ -790,7 +822,7 @@
             margin-top: 12px;
         }
 
-        .raffle-admin-buttons {
+        .action-admin-buttons {
             display: flex;
             gap: 8px;
             margin-top: 12px;
@@ -894,7 +926,7 @@
             border-top: 1px solid var(--border);
         }
 
-        .completed-raffles-list {
+        .completed-actions-list {
             max-height: 300px;
             overflow-y: auto;
             margin-top: 10px;
@@ -903,7 +935,7 @@
             padding: 10px;
         }
 
-        .completed-raffle-item {
+        .completed-action-item {
             padding: 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
@@ -915,16 +947,16 @@
             align-items: center;
         }
 
-        .raffle-info-small {
+        .action-info-small {
             flex-grow: 1;
         }
 
-        .raffle-info-small h4 {
+        .action-info-small h4 {
             margin-bottom: 4px;
             color: var(--primary);
         }
 
-        .btn-delete-raffle {
+        .btn-delete-action {
             background: var(--danger);
             color: white;
             border: none;
@@ -1211,20 +1243,60 @@
             width: 100%;
         }
 
-        .raffle-config-section {
+        .action-config-section {
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid var(--border);
         }
 
-        .raffle-config-section h3 {
+        .action-config-section h3 {
             color: var(--primary);
             margin-bottom: 15px;
             font-size: 1.1rem;
         }
 
+        /* NOVOS ESTILOS PARA OS AVISOS */
+        .random-mode-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--warning);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: fadeInOut 3s forwards;
+            max-width: 90%;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .warning-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            border-radius: 6px;
+        }
+
         @media (max-width: 360px) {
-            .raffles-grid {
+            .actions-grid {
                 grid-template-columns: 1fr;
             }
             
@@ -1271,8 +1343,8 @@
     <div class="container">
         <header>
             <div class="header-left">
-                <h1>WM Rifas Online</h1>
-                <p>Ambiente de testes</p>
+                <h1>WM Ações Online</h1>
+                <p>(V2-Beta)</p>
             </div>
             <div class="header-right">
                 <button class="header-btn" id="instructions-btn" title="Instruções">
@@ -1310,31 +1382,31 @@
             <h2>Painel de Administração</h2>
             <div class="admin-form">
                 <div class="admin-form-group">
-                    <label for="raffle-id">ID da Rifa:</label>
-                    <select id="raffle-id">
-                        <option value="new">Nova Rifa</option>
+                    <label for="action-id">ID da Ação:</label>
+                    <select id="action-id">
+                        <option value="new">Nova Ação</option>
                     </select>
                 </div>
                 <div class="admin-form-group">
-                    <label for="raffle-title">Título:</label>
-                    <input type="text" id="raffle-title" required>
+                    <label for="action-title">Título:</label>
+                    <input type="text" id="action-title" required>
                 </div>
                 <div class="admin-form-group">
-                    <label for="raffle-description">Descrição:</label>
-                    <textarea id="raffle-description" required></textarea>
+                    <label for="action-description">Descrição:</label>
+                    <textarea id="action-description" required></textarea>
                 </div>
                 <div class="admin-form-group">
-                    <label for="raffle-price">Valor por cota (R$):</label>
-                    <input type="number" id="raffle-price" min="1" step="0.01" required>
+                    <label for="action-price">Valor por cota (R$):</label>
+                    <input type="number" id="action-price" min="1" step="0.01" required>
                 </div>
                 <div class="admin-form-group">
                     <label for="total-numbers">Total de cotas:</label>
                     <input type="number" id="total-numbers" min="1" required>
                 </div>
                 
-                <!-- NOVOS CAMPOS PARA CONFIGURAÇÃO POR RIFA -->
-                <div class="raffle-config-section">
-                    <h3>Configurações Específicas da Rifa</h3>
+                <!-- NOVOS CAMPOS PARA CONFIGURAÇÃO POR AÇÃO -->
+                <div class="action-config-section">
+                    <h3>Configurações Específicas da Ação</h3>
                     
                     <div class="admin-form-group">
                         <label for="max-per-token">Máximo de cotas por token (0 = ilimitado):</label>
@@ -1342,9 +1414,8 @@
                     </div>
                     
                     <div class="admin-form-group">
-                        <label for="raffle-selection-mode">Modo de seleção:</label>
-                        <select id="raffle-selection-mode">
-                            <option value="both">Ambos (manual e aleatório)</option>
+                        <label for="action-selection-mode">Modo de seleção:</label>
+                        <select id="action-selection-mode">
                             <option value="manual">Apenas manual</option>
                             <option value="auto">Apenas aleatório</option>
                         </select>
@@ -1352,8 +1423,8 @@
                 </div>
                 
                 <div class="admin-form-group">
-                    <label for="raffle-image">URL da Imagem:</label>
-                    <input type="text" id="raffle-image">
+                    <label for="action-image">URL da Imagem:</label>
+                    <input type="text" id="action-image">
                 </div>
                 <div class="admin-form-group">
                     <label for="premium-numbers">Cotas premiadas (encontrou ganhou):</label>
@@ -1373,7 +1444,7 @@
                 </div>
                 
                 <button class="btn-admin" id="save-settings">Salvar Configurações</button>
-                <button class="btn-admin" id="save-raffle">Salvar Rifa</button>
+                <button class="btn-admin" id="save-action">Salvar Ação</button>
                 <button class="btn-admin" id="make-admin" style="background:var(--info);">
                     <i class="fas fa-user-crown"></i> Tornar-se Administrador
                 </button>
@@ -1403,7 +1474,7 @@
                     </div>
                     
                     <div class="admin-form-group">
-                        <label for="selection-method">Método de seleção para rifas com mais de 100 cotas:</label>
+                        <label for="selection-method">Método de seleção para ações com mais de 100 cotas:</label>
                         <select id="selection-method">
                             <option value="manual">Permitir seleção manual</option>
                             <option value="auto">Apenas seleção aleatória</option>
@@ -1435,19 +1506,35 @@
             </div>
             
             <div class="cleanup-section" id="cleanup-section" style="display: none;">
-                <h3>Limpeza de Rifas Sorteadas</h3>
-                <p>Remova rifas já sorteadas para evitar acúmulo no sistema:</p>
-                <div class="completed-raffles-list" id="completed-raffles-list">
-                    <!-- Rifas sorteadas serão carregadas aqui -->
+                <h3>Limpeza de Ações Sorteadas</h3>
+                <p>Remova ações já sorteadas para evitar acúmulo no sistema:</p>
+                <div class="completed-actions-list" id="completed-actions-list">
+                    <!-- Ações sorteadas serão carregadas aqui -->
                 </div>
-                <button class="btn-admin" id="load-completed-raffles" style="background:var(--warning);margin-top:10px;">
-                    <i class="fas fa-sync"></i> Carregar Rifas Sorteadas
+                <button class="btn-admin" id="load-completed-actions" style="background:var(--warning);margin-top:10px;">
+                    <i class="fas fa-sync"></i> Carregar Ações Sorteadas
                 </button>
             </div>
         </div>
 
         <div class="status-bar" id="status-bar">
-            <div id="status-text">Carregando rifas...</div>
+            <div>
+                <div id="status-text">Carregando ações...</div>
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color legend-green"></div>
+                        <span>Disponíveis</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-orange"></div>
+                        <span>Reservados</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-blue"></div>
+                        <span>Comprados</span>
+                    </div>
+                </div>
+            </div>
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="all">Todas</button>
                 <button class="filter-btn" data-filter="active">Ativas</button>
@@ -1455,14 +1542,14 @@
             </div>
         </div>
         
-        <div class="raffles-grid" id="raffles-container">
+        <div class="actions-grid" id="actions-container">
             <div style="text-align:center;padding:40px;">
-                <i class="fas fa-spinner fa-spin"></i> Carregando rifas...
+                <i class="fas fa-spinner fa-spin"></i> Carregando ações...
             </div>
         </div>
         
         <footer class="footer">
-            Desenvolvido por Wendell Moura ✅🟡🔵 2026 (V1-Beta test)
+            Desenvolvido por Wendell Moura 🔵🟡✅ 2026 (V2-Beta)
         </footer>
     </div>
 
@@ -1474,18 +1561,23 @@
                 <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p><strong>Bem-vindo ao sistema de rifas online:</strong></p>
+                <p><strong>Bem-vindo ao sistema de ações online:</strong></p>
                 <ol style="padding-left:20px;margin:10px 0;">
-                    <li>Escolha uma rifa disponível</li>
-                    <li>Selecione as cotas desejadas</li>
-                    <li>Clique em "Reservar Cotas"</li>
-                    <li>Realize o pagamento em até 24h</li>
-                    <li>Envie o comprovante via WhatsApp</li>
-                    <li>Aguarde confirmação do administrador</li>
-                    <li>Perdeu ou esqueceu o seu Token? Entre em contato com o ADM</li>
-                    <li>Envio/retirada custeado(a) pelo vencedor</li>
+                    <li>Escolha uma ação disponível;</li>
+                    <li>Selecione as cotas desejadas;</li>
+                    <li>Clique em Reservar Cotas;</li>
+                    <li>Realize o pagamento dentro do prazo;</li>
+                    <li>O valor pago refere-se à participação/contribuição na Ação escolhida;</li>
+                    <li>Envie o comprovante via WhatsApp;</li>
+                    <li>Aguarde confirmação do administrador;</li>
+                    <li>Perdeu ou esqueceu o seu Token? Entre em contato com o ADM;</li>
+                    <li>Envio/retirada custeado(a) pelo vencedor;</li>
+                    <li>AS Ações deste site não se caracteriza como jogo de azar ou loteria;</li>
+                    <li>Sua participação é voluntária, guarde o relátorio de gastos (Aba participação) para fins de conferência;</li>
+                    <li>O sorteio utiliza resultado público, externo, auditável e tranparente.</li>
+                    <li>BOA SORTE!</li>
                 </ol>
-                <p><strong>Importante:</strong> Reservas expiram em 24 horas sem pagamento.</p>
+                <p><strong>Importante:</strong> Reservas expiradas são canceladas automaticamente e disponibilizadas para novas reservas, fique atento ao prazo.</p>
             </div>
         </div>
     </div>
@@ -1534,11 +1626,11 @@
                 
                 <div class="code-generated">
                     <div class="code-label">Código de reserva:</div>
-                    <div class="code-value" id="purchase-code">RIFA-XXXX-XXXX</div>
+                    <div class="code-value" id="purchase-code">AÇÃO-XXXX-XXXX</div>
                 </div>
                 
                 <p class="warning-note">
-                    <i class="fas fa-exclamation-circle"></i> Reserva expira em 24 horas
+                    <i class="fas fa-exclamation-circle"></i> Reservas expiradas são canceladas automaticamente, fique atento ao prazo.
                 </p>
             </div>
             <div class="modal-footer">
@@ -1651,7 +1743,7 @@
                     <div id="no-participations" class="no-participations" style="display:none;">
                         <i class="fas fa-ticket-alt"></i>
                         <h3>Nenhuma participação encontrada</h3>
-                        <p>Você ainda não participou de nenhuma rifa.</p>
+                        <p>Você ainda não participou de nenhuma ação.</p>
                     </div>
                     <!-- BOTÃO PARA RELATÓRIO DE GASTOS -->
                     <button class="btn-expense-report" id="btn-expense-report">
@@ -1683,7 +1775,7 @@
     const auth = firebase.auth();
     
     // Elementos DOM
-    const rafflesContainer = document.getElementById('raffles-container');
+    const actionsContainer = document.getElementById('actions-container');
     const tokenBtn = document.getElementById('token-btn');
     const participationBtn = document.getElementById('participation-btn');
     const tokenModal = document.getElementById('token-modal');
@@ -1697,8 +1789,8 @@
     const filterButtons = document.querySelectorAll('.filter-btn');
     const adminToggle = document.getElementById('admin-toggle');
     const adminPanel = document.getElementById('admin-panel');
-    const raffleIdSelect = document.getElementById('raffle-id');
-    const saveRaffleBtn = document.getElementById('save-raffle');
+    const actionIdSelect = document.getElementById('action-id');
+    const saveActionBtn = document.getElementById('save-action');
     const saveSettingsBtn = document.getElementById('save-settings');
     const makeAdminBtn = document.getElementById('make-admin');
     const loginModal = document.getElementById('login-modal');
@@ -1745,8 +1837,8 @@
     const noParticipations = document.getElementById('no-participations');
     const whatsappNumberInput = document.getElementById('whatsapp-number');
     const cleanupSection = document.getElementById('cleanup-section');
-    const completedRafflesList = document.getElementById('completed-raffles-list');
-    const loadCompletedRafflesBtn = document.getElementById('load-completed-raffles');
+    const completedActionsList = document.getElementById('completed-actions-list');
+    const loadCompletedActionsBtn = document.getElementById('load-completed-actions');
     
     // NOVOS ELEMENTOS PARA AS FUNCIONALIDADES ADICIONAIS
     const countdownEnabledCheckbox = document.getElementById('countdown-enabled');
@@ -1764,7 +1856,7 @@
     
     // NOVOS ELEMENTOS PARA AS NOVAS FUNCIONALIDADES
     const maxPerTokenInput = document.getElementById('max-per-token');
-    const raffleSelectionModeSelect = document.getElementById('raffle-selection-mode');
+    const actionSelectionModeSelect = document.getElementById('action-selection-mode');
     const btnAuditReport = document.getElementById('btn-audit-report');
     const btnExpenseReport = document.getElementById('btn-expense-report');
 
@@ -1772,10 +1864,10 @@
     let userToken = localStorage.getItem('userToken') || null;
     let userName = localStorage.getItem('userName') || null;
     let currentFilter = 'all';
-    let raffles = [];
+    let actions = [];
     let userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
-    let unsubscribeRaffles = null;
-    let currentRaffle = null;
+    let unsubscribeActions = null;
+    let currentAction = null;
     let selectedNumbers = [];
     let currentPurchaseCode = null;
     let premiumNumbers = [];
@@ -1820,14 +1912,14 @@
             console.log('Não há token, exibindo modal de configuração');
             tokenSetupModal.style.display = 'flex';
         } else {
-            console.log('Token encontrado, carregando configurações e rifas');
+            console.log('Token encontrado, carregando configurações e ações');
             loadSystemConfig()
                 .then(() => {
-                    loadRaffles();
+                    loadActions();
                 })
                 .catch(error => {
                     console.error("Erro ao carregar configurações, usando padrão", error);
-                    loadRaffles();
+                    loadActions();
                 });
             loadWhatsappNumber();
         }
@@ -1858,19 +1950,19 @@
                 filterButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentFilter = btn.dataset.filter;
-                renderRaffles();
+                renderActions();
             });
         });
         
         // Admin
         adminToggle.addEventListener('click', toggleAdminPanel);
-        saveRaffleBtn.addEventListener('click', saveRaffle);
+        saveActionBtn.addEventListener('click', saveAction);
         saveSettingsBtn.addEventListener('click', saveSettings);
         makeAdminBtn.addEventListener('click', makeAdmin);
         btnLogin.addEventListener('click', handleLogin);
-        raffleIdSelect.addEventListener('change', fillAdminForm);
+        actionIdSelect.addEventListener('change', fillAdminForm);
         setWinnerBtn.addEventListener('click', setWinner);
-        loadCompletedRafflesBtn.addEventListener('click', loadCompletedRaffles);
+        loadCompletedActionsBtn.addEventListener('click', loadCompletedActions);
         
         // Token Setup Tabs
         tabNewToken.addEventListener('click', () => {
@@ -1927,10 +2019,10 @@
             });
         });
         
-        // Load raffles on retry
+        // Load actions on retry
         document.addEventListener('click', (e) => {
             if (e.target.id === 'retry-load') {
-                loadRaffles();
+                loadActions();
             }
         });
 
@@ -1945,7 +2037,7 @@
         }
         
         autoCheckExpiredInterval = setInterval(() => {
-            if (raffles.length > 0) {
+            if (actions.length > 0) {
                 checkAndCancelExpiredReservations();
             }
         }, 5 * 60 * 1000);
@@ -1956,10 +2048,10 @@
         try {
             console.log("Verificando reservas expiradas...");
             
-            for (const raffle of raffles) {
-                if (raffle.status === 'completed' || !raffle.purchases) continue;
+            for (const action of actions) {
+                if (action.status === 'completed' || !action.purchases) continue;
                 
-                const purchases = raffle.purchases;
+                const purchases = action.purchases;
                 const expiredNumbers = [];
                 const purchaseIdsToCancel = new Set();
                 
@@ -1986,10 +2078,10 @@
                 
                 // Cancelar reservas expiradas
                 if (expiredNumbers.length > 0) {
-                    console.log(`Cancelando ${expiredNumbers.length} cotas expiradas na rifa ${raffle.id}`);
+                    console.log(`Cancelando ${expiredNumbers.length} cotas expiradas na ação ${action.id}`);
                     
                     for (const purchaseId of purchaseIdsToCancel) {
-                        await cancelExpiredReservation(purchaseId, raffle.id, expiredNumbers);
+                        await cancelExpiredReservation(purchaseId, action.id, expiredNumbers);
                     }
                 }
             }
@@ -1999,7 +2091,7 @@
     }
 
     // FUNÇÃO PARA CANCELAR RESERVA EXPIRADA
-    async function cancelExpiredReservation(purchaseId, raffleId, numbers) {
+    async function cancelExpiredReservation(purchaseId, actionId, numbers) {
         try {
             await db.collection("purchases").doc(purchaseId).update({
                 status: 'cancelled',
@@ -2012,11 +2104,11 @@
                 updates[`purchases.${number}`] = firebase.firestore.FieldValue.delete();
             });
             
-            await db.collection("raffles").doc(raffleId).update(updates);
+            await db.collection("actions").doc(actionId).update(updates);
             
             console.log(`Reserva ${purchaseId} cancelada automaticamente por expiração`);
             
-            loadRaffles();
+            loadActions();
             
         } catch (error) {
             console.error("Erro ao cancelar reserva expirada:", error);
@@ -2066,7 +2158,7 @@
             .then(() => {
                 systemConfig = configData;
                 showToast('Configurações do sistema salvas!', 'success');
-                loadRaffles(); // Recarregar as rifas para aplicar as novas configurações
+                loadActions(); // Recarregar as ações para aplicar as novas configurações
             })
             .catch(error => {
                 console.error("Erro ao salvar configurações:", error);
@@ -2182,15 +2274,15 @@
     // FUNÇÕES PARA AS NOVAS IMPLEMENTAÇÕES
 
     // Função para verificar limite por token
-    async function checkTokenLimit(raffle, token, additionalNumbers) {
-        if (!raffle.maxPerToken || raffle.maxPerToken <= 0) {
+    async function checkTokenLimit(action, token, additionalNumbers) {
+        if (!action.maxPerToken || action.maxPerToken <= 0) {
             return true; // Sem limite
         }
         
         try {
-            // Buscar todas as compras do token nesta rifa
+            // Buscar todas as compras do token nesta ação
             const purchasesSnapshot = await db.collection("purchases")
-                .where("raffleId", "==", raffle.id)
+                .where("actionId", "==", action.id)
                 .where("userId", "==", token)
                 .where("status", "in", ["confirmed", "pending"])
                 .get();
@@ -2201,11 +2293,37 @@
                 totalPurchased += purchase.numbers ? purchase.numbers.length : 0;
             });
             
-            return (totalPurchased + additionalNumbers.length) <= raffle.maxPerToken;
+            return (totalPurchased + additionalNumbers.length) <= action.maxPerToken;
         } catch (error) {
             console.error("Erro ao verificar limite por token:", error);
             return false;
         }
+    }
+
+    // Função para mostrar aviso de modo aleatório
+    function showRandomModeWarning(element) {
+        // Remover avisos anteriores
+        const existingWarnings = element.querySelectorAll('.random-mode-warning, .warning-overlay');
+        existingWarnings.forEach(warning => warning.remove());
+        
+        // Criar overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'warning-overlay';
+        
+        // Criar mensagem de aviso
+        const warning = document.createElement('div');
+        warning.className = 'random-mode-warning';
+        warning.textContent = 'Modo aleatório ativado, a compra deve ser feita exclusivamente pelo botão aleatório.';
+        
+        // Adicionar ao elemento
+        element.appendChild(overlay);
+        element.appendChild(warning);
+        
+        // Remover após 3 segundos
+        setTimeout(() => {
+            overlay.remove();
+            warning.remove();
+        }, 3000);
     }
 
     // Função para gerar relatório de auditoria
@@ -2218,11 +2336,11 @@
         try {
             showToast('Gerando relatório de auditoria...', 'info');
             
-            // Buscar todas as rifas
-            const rafflesSnapshot = await db.collection("raffles").get();
-            const rafflesData = [];
-            rafflesSnapshot.forEach(doc => {
-                rafflesData.push({ id: doc.id, ...doc.data() });
+            // Buscar todas as ações
+            const actionsSnapshot = await db.collection("actions").get();
+            const actionsData = [];
+            actionsSnapshot.forEach(doc => {
+                actionsData.push({ id: doc.id, ...doc.data() });
             });
             
             // Buscar todas as compras
@@ -2263,7 +2381,7 @@
             
             doc.setFontSize(11);
             let yPos = 50;
-            doc.text(`Total de Rifas: ${rafflesData.length}`, 14, yPos);
+            doc.text(`Total de Ações: ${actionsData.length}`, 14, yPos);
             yPos += 7;
             doc.text(`Total de Usuários: ${usersData.length}`, 14, yPos);
             yPos += 7;
@@ -2282,25 +2400,25 @@
             doc.text(`Compras Canceladas: ${cancelledPurchases}`, 14, yPos);
             yPos += 10;
             
-            // Tabela de Rifas
+            // Tabela de Ações
             doc.setFontSize(14);
-            doc.text("RIFAS CADASTRADAS", 14, yPos);
+            doc.text("AÇÕES CADASTRADAS", 14, yPos);
             yPos += 10;
             
-            const raffleTableData = rafflesData.map(raffle => [
-                raffle.id.substring(0, 8) + '...',
-                raffle.title,
-                raffle.status === 'completed' ? 'Sorteada' : 'Ativa',
-                raffle.totalNumbers,
-                `R$ ${raffle.price.toFixed(2)}`,
-                raffle.maxPerToken || 'Ilimitado',
-                raffle.selectionMode || 'both'
+            const actionTableData = actionsData.map(action => [
+                action.id.substring(0, 8) + '...',
+                action.title,
+                action.status === 'completed' ? 'Sorteada' : 'Ativa',
+                action.totalNumbers,
+                `R$ ${action.price.toFixed(2)}`,
+                action.maxPerToken || 'Ilimitado',
+                action.selectionMode || 'manual'
             ]);
             
             doc.autoTable({
                 startY: yPos,
                 head: [['ID', 'Título', 'Status', 'Cotas', 'Valor', 'Max/Token', 'Modo Seleção']],
-                body: raffleTableData,
+                body: actionTableData,
                 theme: 'grid',
                 headStyles: { fillColor: [44, 62, 80] },
                 margin: { left: 14 }
@@ -2330,8 +2448,8 @@
             const recentPurchases = purchasesData.slice(0, 20);
             
             const purchaseTableData = recentPurchases.map(purchase => {
-                const raffle = rafflesData.find(r => r.id === purchase.raffleId);
-                const raffleTitle = raffle ? raffle.title : 'Rifa não encontrada';
+                const action = actionsData.find(r => r.id === purchase.actionId);
+                const actionTitle = action ? action.title : 'Ação não encontrada';
                 const date = purchase.reservedAt ? purchase.reservedAt.toLocaleDateString('pt-BR') : 'N/A';
                 
                 let statusText = '';
@@ -2344,7 +2462,7 @@
                 
                 return [
                     purchase.code,
-                    raffleTitle,
+                    actionTitle,
                     purchase.userName || 'Anônimo',
                     purchase.numbers ? purchase.numbers.length : 0,
                     `R$ ${purchase.total ? purchase.total.toFixed(2) : '0.00'}`,
@@ -2355,7 +2473,7 @@
             
             doc.autoTable({
                 startY: yPos,
-                head: [['Código', 'Rifa', 'Cliente', 'Cotas', 'Valor', 'Status', 'Data']],
+                head: [['Código', 'Ação', 'Cliente', 'Cotas', 'Valor', 'Status', 'Data']],
                 body: purchaseTableData,
                 theme: 'grid',
                 headStyles: { fillColor: [44, 62, 80] },
@@ -2404,14 +2522,14 @@
                 return;
             }
             
-            // Buscar as rifas relacionadas
-            const raffleIds = [...new Set(purchases.map(p => p.raffleId))];
-            const rafflesData = [];
+            // Buscar as ações relacionadas
+            const actionIds = [...new Set(purchases.map(p => p.actionId))];
+            const actionsData = [];
             
-            for (const raffleId of raffleIds) {
-                const raffleDoc = await db.collection("raffles").doc(raffleId).get();
-                if (raffleDoc.exists) {
-                    rafflesData.push({ id: raffleDoc.id, ...raffleDoc.data() });
+            for (const actionId of actionIds) {
+                const actionDoc = await db.collection("actions").doc(actionId).get();
+                if (actionDoc.exists) {
+                    actionsData.push({ id: actionDoc.id, ...actionDoc.data() });
                 }
             }
             
@@ -2474,8 +2592,8 @@
             });
             
             const purchaseTableData = purchases.map(purchase => {
-                const raffle = rafflesData.find(r => r.id === purchase.raffleId);
-                const raffleTitle = raffle ? raffle.title : 'Rifa não encontrada';
+                const action = actionsData.find(r => r.id === purchase.actionId);
+                const actionTitle = action ? action.title : 'Ação não encontrada';
                 const date = purchase.reservedAt ? purchase.reservedAt.toLocaleDateString('pt-BR') : 'N/A';
                 
                 let statusText = '';
@@ -2488,7 +2606,7 @@
                 
                 return [
                     purchase.code,
-                    raffleTitle,
+                    actionTitle,
                     purchase.numbers ? purchase.numbers.length : 0,
                     `R$ ${purchase.total ? purchase.total.toFixed(2) : '0.00'}`,
                     statusText,
@@ -2498,7 +2616,7 @@
             
             doc.autoTable({
                 startY: yPos,
-                head: [['Código', 'Rifa', 'Cotas', 'Valor', 'Status', 'Data']],
+                head: [['Código', 'Ação', 'Cotas', 'Valor', 'Status', 'Data']],
                 body: purchaseTableData,
                 theme: 'grid',
                 headStyles: { fillColor: [52, 152, 219] },
@@ -2544,14 +2662,14 @@
             tokenModal.style.display = 'none';
             tokenSetupModal.style.display = 'flex';
             
-            rafflesContainer.innerHTML = `
+            actionsContainer.innerHTML = `
                 <div style="text-align:center;padding:40px;">
-                    <i class="fas fa-spinner fa-spin"></i> Carregando rifas...
+                    <i class="fas fa-spinner fa-spin"></i> Carregando ações...
                 </div>
             `;
             
-            if (unsubscribeRaffles) {
-                unsubscribeRaffles();
+            if (unsubscribeActions) {
+                unsubscribeActions();
             }
         }
     }
@@ -2707,11 +2825,11 @@
             showToast('Token criado com sucesso!', 'success');
             loadSystemConfig()
                 .then(() => {
-                    loadRaffles();
+                    loadActions();
                 })
                 .catch(error => {
                     console.error("Erro ao carregar configurações, usando padrão", error);
-                    loadRaffles();
+                    loadActions();
                 });
             loadWhatsappNumber();
         })
@@ -2743,11 +2861,11 @@
                 showToast('Token carregado! Bem-vindo!', 'success');
                 loadSystemConfig()
                     .then(() => {
-                        loadRaffles();
+                        loadActions();
                     })
                     .catch(error => {
                         console.error("Erro ao carregar configurações, usando padrão", error);
-                        loadRaffles();
+                        loadActions();
                     });
                 loadWhatsappNumber();
             } else {
@@ -2760,36 +2878,36 @@
         });
     }
 
-    function loadRaffles() {
+    function loadActions() {
         firebaseStatus.style.display = 'block';
         firebaseStatus.textContent = 'Conectando ao sistema...';
         
-        unsubscribeRaffles = db.collection("raffles").onSnapshot(
+        unsubscribeActions = db.collection("actions").onSnapshot(
             snapshot => {
                 firebaseStatus.style.display = 'none';
-                raffles = [];
+                actions = [];
                 
                 if (snapshot.empty) {
-                    rafflesContainer.innerHTML = `
+                    actionsContainer.innerHTML = `
                         <div style="text-align:center;padding:40px;color:var(--secondary);">
                             <i class="fas fa-box-open" style="font-size:3rem;margin-bottom:15px;"></i>
-                            <h3>Nenhuma rifa disponível</h3>
-                            <p>Crie uma rifa no painel administrativo</p>
+                            <h3>Nenhuma ação disponível</h3>
+                            <p>Crie uma ação no painel administrativo</p>
                         </div>
                     `;
-                    statusText.textContent = "Nenhuma rifa encontrada";
+                    statusText.textContent = "Nenhuma ação encontrada";
                     return;
                 }
                 
                 snapshot.forEach(doc => {
-                    raffles.push({ id: doc.id, ...doc.data() });
+                    actions.push({ id: doc.id, ...doc.data() });
                 });
                 
-                renderRaffles();
-                updateAdminRaffleSelect();
+                renderActions();
+                updateAdminActionSelect();
             },
             error => {
-                console.error("Erro ao carregar rifas: ", error);
+                console.error("Erro ao carregar ações: ", error);
                 
                 const errorMsg = error.code === 'permission-denied' ? 
                     "Permissão negada. Configure as regras do Firebase" : 
@@ -2797,7 +2915,7 @@
 
                 firebaseStatus.textContent = errorMsg;
                 
-                rafflesContainer.innerHTML = `
+                actionsContainer.innerHTML = `
                     <div style="text-align:center;padding:40px;color:var(--danger);">
                         <i class="fas fa-exclamation-triangle" style="font-size:3rem;margin-bottom:15px;"></i> 
                         <p>${errorMsg}</p>
@@ -2808,64 +2926,63 @@
         );
     }
 
-    function renderRaffles() {
-        if (raffles.length === 0) {
-            rafflesContainer.innerHTML = `
+    function renderActions() {
+        if (actions.length === 0) {
+            actionsContainer.innerHTML = `
                 <div style="text-align:center;padding:40px;color:var(--secondary);">
                     <i class="fas fa-box-open" style="font-size:3rem;margin-bottom:15px;"></i>
-                    <h3>Nenhuma rifa disponível</h3>
-                    <p>Crie uma rifa no painel administrativo</p>
+                    <h3>Nenhuma ação disponível</h3>
+                    <p>Crie uma ação no painel administrativo</p>
                 </div>
             `;
-            statusText.textContent = "Nenhuma rifa encontrada";
+            statusText.textContent = "Nenhuma ação encontrada";
             return;
         }
         
-        rafflesContainer.innerHTML = '';
+        actionsContainer.innerHTML = '';
         
-        const filteredRaffles = raffles.filter(raffle => {
-            if (currentFilter === 'active' && raffle.status === 'completed') return false;
-            if (currentFilter === 'completed' && raffle.status !== 'completed') return false;
+        const filteredActions = actions.filter(action => {
+            if (currentFilter === 'active' && action.status === 'completed') return false;
+            if (currentFilter === 'completed' && action.status !== 'completed') return false;
             return true;
         });
         
-        filteredRaffles.forEach(raffle => {
-            const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
-            const pendingNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'pending').length : 0;
+        filteredActions.forEach(action => {
+            const soldNumbers = action.purchases ? Object.values(action.purchases).filter(p => p.status === 'confirmed').length : 0;
+            const pendingNumbers = action.purchases ? Object.values(action.purchases).filter(p => p.status === 'pending').length : 0;
             const totalSold = soldNumbers + pendingNumbers;
-            const progress = (totalSold / raffle.totalNumbers) * 100;
-            const isCompleted = raffle.status === 'completed';
+            const progress = (totalSold / action.totalNumbers) * 100;
+            const isCompleted = action.status === 'completed';
             
-            // USAR CONFIGURAÇÃO INDIVIDUAL DA RIFA
-            // Se a rifa tiver configuração própria, usar ela, senão usar a configuração do sistema
-            const raffleSelectionMode = raffle.selectionMode || 'both';
-            const raffleMaxPerToken = raffle.maxPerToken || 0;
+            // USAR CONFIGURAÇÃO INDIVIDUAL DA AÇÃO
+            // Converter 'both' para 'manual' para compatibilidade
+            const actionSelectionMode = action.selectionMode === 'both' ? 'manual' : (action.selectionMode || 'manual');
+            const actionMaxPerToken = action.maxPerToken || 0;
             
-            // Remover qualquer regra global baseada em quantidade de cotas
-            const autoOnly = raffleSelectionMode === 'auto';
-            const needsModeSelector = raffleSelectionMode === 'both';
+            const autoOnly = actionSelectionMode === 'auto';
+            const manualOnly = actionSelectionMode === 'manual';
             
             const card = document.createElement('div');
-            card.className = 'raffle-card';
-            card.dataset.id = raffle.id;
+            card.className = 'action-card';
+            card.dataset.id = action.id;
             
             let statusBadge = '';
             if (isCompleted) {
                 statusBadge = `<div class="status-badge status-completed">SORTEADA</div>`;
-                if (raffle.winnerName) {
+                if (action.winnerName) {
                     statusBadge += `<div class="winner-badge"><i class="fas fa-crown"></i> VENCEDOR</div>`;
                 }
             } else {
                 statusBadge = `<div class="status-badge status-active">ATIVA</div>`;
             }
             
-            const premiumWinners = raffle.premiumWinners || {};
+            const premiumWinners = action.premiumWinners || {};
             const hasPremiumWinners = Object.keys(premiumWinners).length > 0;
             
             card.innerHTML = `
-                <div class="raffle-image">
-                    ${raffle.image ? 
-                        `<img src="${raffle.image}" alt="${raffle.title}" 
+                <div class="action-image">
+                    ${action.image ? 
+                        `<img src="${action.image}" alt="${action.title}" 
                             onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#d1d8e0;\'><i class=\'fas fa-gift fa-3x\'></i></div>'">` : 
                         `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#d1d8e0;"><i class="fas fa-gift fa-3x"></i></div>`
                     }
@@ -2875,17 +2992,17 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">${raffle.title}</h3>
-                    <p class="card-description">${raffle.description}</p>
+                    <h3 class="card-title">${action.title}</h3>
+                    <p class="card-description">${action.description}</p>
                     
-                    <div class="raffle-info">
+                    <div class="action-info">
                         <div class="info-item">
                             <span class="info-label">Valor:</span>
-                            <span class="info-value">R$ ${raffle.price.toFixed(2)}</span>
+                            <span class="info-value">R$ ${action.price.toFixed(2)}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Vendidas:</span>
-                            <span class="info-value">${soldNumbers}/${raffle.totalNumbers}</span>
+                            <span class="info-value">${soldNumbers}/${action.totalNumbers}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Reservas:</span>
@@ -2893,55 +3010,40 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Prêmio instantâneo:</span>
-                            <span class="info-value">${raffle.premiumNumbers && raffle.premiumNumbers.length > 0 ? 'Sim' : 'Não'}</span>
+                            <span class="info-value">${action.premiumNumbers && action.premiumNumbers.length > 0 ? 'Sim' : 'Não'}</span>
                         </div>
-                        ${raffleMaxPerToken > 0 ? `
-                        <div class="info-item">
-                            <span class="info-label">Max/token:</span>
-                            <span class="info-value">${raffleMaxPerToken}</span>
-                        </div>
-                        ` : ''}
                     </div>
                     
                     ${!isCompleted ? `
                         ${autoOnly ? `
                             <div class="auto-selection-info">
-                                <i class="fas fa-random"></i> Esta rifa utiliza seleção aleatória.
-                            </div>
-                        ` : ''}
-                        
-                        ${needsModeSelector ? `
-                            <div class="selection-mode-selector">
-                                <div class="mode-btn active" data-mode="manual" id="mode-manual-${raffle.id}">
-                                    <i class="fas fa-mouse-pointer"></i> Manual
-                                </div>
-                                <div class="mode-btn" data-mode="auto" id="mode-auto-${raffle.id}">
-                                    <i class="fas fa-random"></i> Aleatório
-                                </div>
+                                <i class="fas fa-random"></i> Selecionar Aleatoriamente" para escolher suas cotas.
                             </div>
                         ` : ''}
                         
                         <div class="selection-controls">
                             <div class="quantity-selector">
-                                <button class="qty-btn" id="decrease-qty-${raffle.id}">-</button>
-                                <input type="number" class="qty-input" id="qty-input-${raffle.id}" value="1" min="1" max="${raffle.totalNumbers - totalSold}">
-                                <button class="qty-btn" id="increase-qty-${raffle.id}">+</button>
+                                <button class="qty-btn" id="decrease-qty-${action.id}">-</button>
+                                <input type="number" class="qty-input" id="qty-input-${action.id}" value="1" min="1" max="${action.totalNumbers - totalSold}">
+                                <button class="qty-btn" id="increase-qty-${action.id}">+</button>
+                                <button class="qty-btn quick-qty-btn" id="plus5-qty-${action.id}">+5</button>
+                                <button class="qty-btn quick-qty-btn" id="plus10-qty-${action.id}">+10</button>
                             </div>
                             ${autoOnly ? `
-                                <button class="btn-select-random" id="random-select-${raffle.id}">
+                                <button class="btn-select-random" id="random-select-${action.id}">
                                     <i class="fas fa-random"></i> Selecionar Aleatoriamente
                                 </button>
                             ` : `
-                                <button class="btn-select-random" id="random-select-${raffle.id}">
+                                <button class="btn-select-random" id="random-select-${action.id}">
                                     <i class="fas fa-random"></i> Aleatório
                                 </button>
                             `}
                         </div>
                         
-                        <div class="numbers-grid ${autoOnly ? 'scrollable' : ''}" id="numbers-grid-${raffle.id}">
-                            ${Array.from({length: raffle.totalNumbers}, (_, i) => {
+                        <div class="numbers-grid ${autoOnly ? 'scrollable' : ''}" id="numbers-grid-${action.id}">
+                            ${Array.from({length: action.totalNumbers}, (_, i) => {
                                 const number = i + 1;
-                                const purchase = raffle.purchases && raffle.purchases[number];
+                                const purchase = action.purchases && action.purchases[number];
                                 let className = 'number-item ';
                                 let title = 'Cota disponível';
                                 
@@ -2960,7 +3062,7 @@
                                     className += 'number-available';
                                 }
                                 
-                                if (raffle.premiumNumbers && raffle.premiumNumbers.includes(number)) {
+                                if (action.premiumNumbers && action.premiumNumbers.includes(number)) {
                                     if (userIsAdmin) {
                                         className += ' number-premium';
                                         title += ' - Cota premiada (somente admin vê)';
@@ -2976,18 +3078,18 @@
                             }).join('')}
                         </div>
                         
-                        <button class="btn-purchase" id="btn-purchase-${raffle.id}" ${totalSold === raffle.totalNumbers ? 'disabled' : ''}>
+                        <button class="btn-purchase" id="btn-purchase-${action.id}" ${totalSold === action.totalNumbers ? 'disabled' : ''}>
                             <i class="fas fa-shopping-cart"></i> Reservar Cotas
                         </button>
                     ` : ''}
                     
-                    ${raffle.status === 'completed' ? `
-                        ${raffle.winningNumber ? `
+                    ${action.status === 'completed' ? `
+                        ${action.winningNumber ? `
                             <div class="winner-details">
                                 <h4><i class="fas fa-crown"></i> SORTEIO REALIZADO</h4>
-                                <p><strong>Número sorteado:</strong> ${raffle.winningNumber}</p>
-                                ${raffle.winnerName ? 
-                                    `<p><strong>Vencedor:</strong> ${raffle.winnerName}</p>` : 
+                                <p><strong>Número sorteado:</strong> ${action.winningNumber}</p>
+                                ${action.winnerName ? 
+                                    `<p><strong>Vencedor:</strong> ${action.winnerName}</p>` : 
                                     `<p><strong>Vencedor:</strong> A ser anunciado</p>`
                                 }
                             </div>
@@ -3007,15 +3109,15 @@
                         </div>
                     ` : ''}
                     
-                    ${soldNumbers === raffle.totalNumbers && !isCompleted && userIsAdmin ? `
-                        <div class="raffle-admin-buttons">
-                            <button class="btn-set-winner" data-id="${raffle.id}">
+                    ${soldNumbers === action.totalNumbers && !isCompleted && userIsAdmin ? `
+                        <div class="action-admin-buttons">
+                            <button class="btn-set-winner" data-id="${action.id}">
                                 <i class="fas fa-trophy"></i> Definir Vencedor
                             </button>
                         </div>
                     ` : ''}
                     
-                    ${soldNumbers === raffle.totalNumbers && !isCompleted ? `
+                    ${soldNumbers === action.totalNumbers && !isCompleted ? `
                         <div class="winner-section">
                             <h4><i class="fas fa-trophy"></i> Todas as Cotas Vendidas!</h4>
                             <p>Sorteio em breve através de site sorteador oficial.</p>
@@ -3023,95 +3125,115 @@
                     ` : ''}
                 </div>
             `;
-            rafflesContainer.appendChild(card);
+            actionsContainer.appendChild(card);
             
             if (!isCompleted) {
-                setupRaffleInteractions(raffle);
+                setupActionInteractions(action);
             }
             
-            if (soldNumbers === raffle.totalNumbers && !isCompleted && userIsAdmin) {
+            if (soldNumbers === action.totalNumbers && !isCompleted && userIsAdmin) {
                 const setWinnerBtn = card.querySelector(`.btn-set-winner`);
                 
                 if (setWinnerBtn) {
                     setWinnerBtn.addEventListener('click', () => {
-                        raffleIdSelect.value = raffle.id;
+                        actionIdSelect.value = action.id;
                         fillAdminForm();
                         adminPanel.style.display = 'block';
                         winnerInputSection.style.display = 'block';
-                        winnerNumberInput.max = raffle.totalNumbers;
+                        winnerNumberInput.max = action.totalNumbers;
                         winnerNumberInput.min = 1;
                         winnerNumberInput.value = '';
                     });
                 }
+            }
+            
+            // Carregar limite restante para token se aplicável
+            if (actionMaxPerToken > 0 && userToken) {
+                loadRemainingForToken(action);
             }
         });
         
         updateStatusBar();
     }
 
-    function setupRaffleInteractions(raffle) {
-        const raffleId = raffle.id;
-        const numbersGrid = document.getElementById(`numbers-grid-${raffleId}`);
-        const purchaseBtn = document.getElementById(`btn-purchase-${raffleId}`);
-        const randomBtn = document.getElementById(`random-select-${raffleId}`);
-        const qtyInput = document.getElementById(`qty-input-${raffleId}`);
-        const decreaseBtn = document.getElementById(`decrease-qty-${raffleId}`);
-        const increaseBtn = document.getElementById(`increase-qty-${raffleId}`);
+    function setupActionInteractions(action) {
+        const actionId = action.id;
+        const numbersGrid = document.getElementById(`numbers-grid-${actionId}`);
+        const purchaseBtn = document.getElementById(`btn-purchase-${actionId}`);
+        const randomBtn = document.getElementById(`random-select-${actionId}`);
+        const qtyInput = document.getElementById(`qty-input-${actionId}`);
+        const decreaseBtn = document.getElementById(`decrease-qty-${actionId}`);
+        const increaseBtn = document.getElementById(`increase-qty-${actionId}`);
+        const plus5Btn = document.getElementById(`plus5-qty-${actionId}`);
+        const plus10Btn = document.getElementById(`plus10-qty-${actionId}`);
         
         let localSelectedNumbers = [];
         
-        // USAR CONFIGURAÇÃO INDIVIDUAL DA RIFA
-        const raffleSelectionMode = raffle.selectionMode || 'both';
-        const autoOnly = raffleSelectionMode === 'auto';
-        const needsModeSelector = raffleSelectionMode === 'both';
+        // Converter 'both' para 'manual' para compatibilidade
+        const actionSelectionMode = action.selectionMode === 'both' ? 'manual' : (action.selectionMode || 'manual');
+        const autoOnly = actionSelectionMode === 'auto';
+        const manualOnly = actionSelectionMode === 'manual';
         
-        // Se for autoOnly, não deve ter seletor de modo nem permitir seleção manual
-        if (autoOnly) {
-            // Garantir que não há seletor de modo visível
-            const modeSelector = document.querySelector(`#mode-manual-${raffleId}`);
-            if (modeSelector) {
-                modeSelector.parentElement.style.display = 'none';
+        // Configurar botões de quantidade
+        decreaseBtn.addEventListener('click', () => {
+            let value = parseInt(qtyInput.value);
+            if (value > 1) {
+                qtyInput.value = value - 1;
             }
+        });
+        
+        increaseBtn.addEventListener('click', () => {
+            let value = parseInt(qtyInput.value);
+            const totalSold = action.purchases ? Object.keys(action.purchases).length : 0;
+            const available = action.totalNumbers - totalSold;
+            if (value < available) {
+                qtyInput.value = value + 1;
+            }
+        });
+        
+        plus5Btn.addEventListener('click', () => {
+            let value = parseInt(qtyInput.value);
+            const totalSold = action.purchases ? Object.keys(action.purchases).length : 0;
+            const available = action.totalNumbers - totalSold;
+            value += 5;
+            if (value > available) value = available;
+            if (value < 1) value = 1;
+            qtyInput.value = value;
+        });
+        
+        plus10Btn.addEventListener('click', () => {
+            let value = parseInt(qtyInput.value);
+            const totalSold = action.purchases ? Object.keys(action.purchases).length : 0;
+            const available = action.totalNumbers - totalSold;
+            value += 10;
+            if (value > available) value = available;
+            if (value < 1) value = 1;
+            qtyInput.value = value;
+        });
+        
+        qtyInput.addEventListener('change', () => {
+            let value = parseInt(qtyInput.value);
+            const totalSold = action.purchases ? Object.keys(action.purchases).length : 0;
+            const available = action.totalNumbers - totalSold;
             
-            // Para seleção automática apenas, garantir que a grade seja rolável
-            numbersGrid.classList.add('scrollable');
-            
-            // Desabilitar clique nos números individualmente
+            if (value < 1) qtyInput.value = 1;
+            if (value > available) qtyInput.value = available;
+        });
+        
+        // Configurar interação com números
+        if (autoOnly) {
+            // Modo aleatório: desabilitar seleção manual e adicionar aviso
             const numberItems = numbersGrid.querySelectorAll('.number-item');
             numberItems.forEach(item => {
-                if (!item.classList.contains('number-purchased') && 
-                    !item.classList.contains('number-pending') &&
-                    !item.classList.contains('number-cancelled')) {
-                    item.style.pointerEvents = 'none';
+                if (item.classList.contains('number-available')) {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showRandomModeWarning(numbersGrid);
+                    });
                 }
             });
-            
-            // Permitir rolagem
-            numbersGrid.style.pointerEvents = 'auto';
-        }
-        
-        if (needsModeSelector) {
-            const manualBtn = document.getElementById(`mode-manual-${raffleId}`);
-            const autoBtn = document.getElementById(`mode-auto-${raffleId}`);
-            
-            if (manualBtn && autoBtn) {
-                manualBtn.addEventListener('click', () => {
-                    manualBtn.classList.add('active');
-                    autoBtn.classList.remove('active');
-                    enableManualSelection(raffleId);
-                });
-                
-                autoBtn.addEventListener('click', () => {
-                    autoBtn.classList.add('active');
-                    manualBtn.classList.remove('active');
-                    enableAutoSelection(raffleId);
-                });
-                
-                // Iniciar no modo manual por padrão
-                enableManualSelection(raffleId);
-            }
-        } else if (raffleSelectionMode === 'manual') {
-            // Para rifas com modo manual, permitir seleção manual normalmente
+        } else if (manualOnly) {
+            // Modo manual: permitir seleção normal
             numbersGrid.addEventListener('click', (e) => {
                 const numberItem = e.target.closest('.number-item');
                 if (!numberItem) return;
@@ -3138,34 +3260,9 @@
             });
         }
         
-        decreaseBtn.addEventListener('click', () => {
-            let value = parseInt(qtyInput.value);
-            if (value > 1) {
-                qtyInput.value = value - 1;
-            }
-        });
-        
-        increaseBtn.addEventListener('click', () => {
-            let value = parseInt(qtyInput.value);
-            const totalSold = raffle.purchases ? Object.keys(raffle.purchases).length : 0;
-            const available = raffle.totalNumbers - totalSold;
-            if (value < available) {
-                qtyInput.value = value + 1;
-            }
-        });
-        
-        qtyInput.addEventListener('change', () => {
-            let value = parseInt(qtyInput.value);
-            const totalSold = raffle.purchases ? Object.keys(raffle.purchases).length : 0;
-            const available = raffle.totalNumbers - totalSold;
-            
-            if (value < 1) qtyInput.value = 1;
-            if (value > available) qtyInput.value = available;
-        });
-        
         randomBtn.addEventListener('click', () => {
-            const totalSold = raffle.purchases ? Object.keys(raffle.purchases).length : 0;
-            const available = raffle.totalNumbers - totalSold;
+            const totalSold = action.purchases ? Object.keys(action.purchases).length : 0;
+            const available = action.totalNumbers - totalSold;
             const qty = parseInt(qtyInput.value);
             
             if (qty > available) {
@@ -3178,13 +3275,13 @@
                 return;
             }
             
-            const allNumbers = Array.from({length: raffle.totalNumbers}, (_, i) => i + 1);
-            const purchasedNumbers = raffle.purchases ? Object.keys(raffle.purchases).map(Number) : [];
+            const allNumbers = Array.from({length: action.totalNumbers}, (_, i) => i + 1);
+            const purchasedNumbers = action.purchases ? Object.keys(action.purchases).map(Number) : [];
             const availableNumbers = allNumbers.filter(n => !purchasedNumbers.includes(n));
             
             // Verificar e cancelar reservas expiradas antes de selecionar
             const expiredNumbers = availableNumbers.filter(number => {
-                const purchase = raffle.purchases && raffle.purchases[number];
+                const purchase = action.purchases && action.purchases[number];
                 if (purchase && purchase.status === 'pending' && purchase.expiresAt) {
                     const now = new Date();
                     let expirationDate;
@@ -3205,9 +3302,9 @@
             // Se houver números expirados, cancelá-los
             if (expiredNumbers.length > 0) {
                 expiredNumbers.forEach(number => {
-                    const purchase = raffle.purchases[number];
+                    const purchase = action.purchases[number];
                     if (purchase && purchase.purchaseId) {
-                        cancelExpiredReservation(purchase.purchaseId, raffle.id, [number]);
+                        cancelExpiredReservation(purchase.purchaseId, action.id, [number]);
                     }
                 });
                 
@@ -3251,17 +3348,17 @@
             }
             
             // Verificar limite por token
-            if (raffle.maxPerToken && raffle.maxPerToken > 0) {
-                const withinLimit = await checkTokenLimit(raffle, userToken, localSelectedNumbers);
+            if (action.maxPerToken && action.maxPerToken > 0) {
+                const withinLimit = await checkTokenLimit(action, userToken, localSelectedNumbers);
                 if (!withinLimit) {
-                    showToast(`Limite de ${raffle.maxPerToken} cotas por token nesta rifa. Você já atingiu ou excedeu o limite.`, 'error');
+                    showToast(`Limite de ${action.maxPerToken} cotas por token nesta ação. Você já atingiu ou excedeu o limite.`, 'error');
                     return;
                 }
             }
             
             // Verificar se há reservas expiradas antes de processar
             const expiredNumbers = localSelectedNumbers.filter(number => {
-                const purchase = raffle.purchases && raffle.purchases[number];
+                const purchase = action.purchases && action.purchases[number];
                 if (purchase && purchase.status === 'pending' && purchase.expiresAt) {
                     const now = new Date();
                     let expirationDate;
@@ -3282,9 +3379,9 @@
             if (expiredNumbers.length > 0) {
                 // Cancelar reservas expiradas primeiro
                 expiredNumbers.forEach(number => {
-                    const purchase = raffle.purchases[number];
+                    const purchase = action.purchases[number];
                     if (purchase && purchase.purchaseId) {
-                        cancelExpiredReservation(purchase.purchaseId, raffle.id, [number]);
+                        cancelExpiredReservation(purchase.purchaseId, action.id, [number]);
                     }
                 });
                 
@@ -3292,7 +3389,7 @@
                 return;
             }
             
-            const purchasedNumbers = raffle.purchases ? Object.keys(raffle.purchases).map(Number) : [];
+            const purchasedNumbers = action.purchases ? Object.keys(action.purchases).map(Number) : [];
             const unavailableNumbers = localSelectedNumbers.filter(n => purchasedNumbers.includes(n));
             
             if (unavailableNumbers.length > 0) {
@@ -3300,85 +3397,53 @@
                 return;
             }
             
-            processReservation(raffle, localSelectedNumbers);
+            processReservation(action, localSelectedNumbers);
         });
     }
 
-    function enableManualSelection(raffleId) {
-        const numbersGrid = document.getElementById(`numbers-grid-${raffleId}`);
-        const manualBtn = document.getElementById(`mode-manual-${raffleId}`);
+    // FUNÇÃO PARA CARREGAR LIMITE RESTANTE POR TOKEN
+    async function loadRemainingForToken(action) {
+        if (!userToken) return;
         
-        // Habilitar clique nos números
-        numbersGrid.style.pointerEvents = 'auto';
-        
-        const numberItems = numbersGrid.querySelectorAll('.number-item');
-        numberItems.forEach(item => {
-            if (!item.classList.contains('number-purchased') && 
-                !item.classList.contains('number-pending') &&
-                !item.classList.contains('number-cancelled')) {
-                item.style.pointerEvents = 'auto';
-            }
-        });
-        
-        // Adicionar event listener para seleção manual
-        const handleNumberClick = (e) => {
-            const numberItem = e.target.closest('.number-item');
-            if (!numberItem) return;
+        try {
+            const purchasesSnapshot = await db.collection("purchases")
+                .where("actionId", "==", action.id)
+                .where("userId", "==", userToken)
+                .where("status", "in", ["confirmed", "pending"])
+                .get();
             
-            if (numberItem.classList.contains('number-purchased') || 
-                numberItem.classList.contains('number-pending') ||
-                numberItem.classList.contains('number-cancelled')) {
-                showToast('Cota não disponível', 'error');
-                return;
-            }
+            let totalPurchased = 0;
+            purchasesSnapshot.forEach(doc => {
+                const purchase = doc.data();
+                totalPurchased += purchase.numbers ? purchase.numbers.length : 0;
+            });
             
-            const number = parseInt(numberItem.dataset.number);
+            const remaining = action.maxPerToken - totalPurchased;
+            const remainingInfo = document.querySelector(`[data-id="${action.id}"] .action-info`);
             
-            if (numberItem.classList.contains('number-selected')) {
-                numberItem.classList.remove('number-selected');
-            } else {
-                numberItem.classList.add('number-selected');
+            if (remainingInfo) {
+                // Remover item de limite antigo se existir
+                const oldLimitItem = remainingInfo.querySelector('.limit-info-item');
+                if (oldLimitItem) {
+                    oldLimitItem.remove();
+                }
+                
+                // Adicionar novo item de limite
+                const limitItem = document.createElement('div');
+                limitItem.className = 'info-item limit-info-item';
+                limitItem.innerHTML = `
+                    <span class="info-label">Cotas limitadas:</span>
+                    <span class="info-value">Você ainda pode comprar ${remaining} cotas</span>
+                `;
+                remainingInfo.appendChild(limitItem);
             }
-        };
-        
-        numbersGrid.addEventListener('click', handleNumberClick);
-        
-        // Atualizar texto do botão
-        if (manualBtn) {
-            manualBtn.innerHTML = '<i class="fas fa-mouse-pointer"></i> Manual (Ativo)';
-        }
-    }
-
-    function enableAutoSelection(raffleId) {
-        const numbersGrid = document.getElementById(`numbers-grid-${raffleId}`);
-        const autoBtn = document.getElementById(`mode-auto-${raffleId}`);
-        
-        // Manter a grade rolável
-        numbersGrid.classList.add('scrollable');
-        
-        // Desabilitar clique nos números individualmente
-        const numberItems = numbersGrid.querySelectorAll('.number-item');
-        numberItems.forEach(item => {
-            item.style.pointerEvents = 'none';
-        });
-        
-        // Permitir rolagem no container
-        numbersGrid.style.pointerEvents = 'auto';
-        
-        // Limpar seleções manuais
-        const selectedNumbers = numbersGrid.querySelectorAll('.number-selected');
-        selectedNumbers.forEach(num => {
-            num.classList.remove('number-selected');
-        });
-        
-        // Atualizar texto do botão
-        if (autoBtn) {
-            autoBtn.innerHTML = '<i class="fas fa-random"></i> Aleatório (Ativo)';
+        } catch (error) {
+            console.error("Erro ao carregar limite por token:", error);
         }
     }
 
     // FUNÇÃO MELHORADA PARA PROCESSAR RESERVA
-    async function processReservation(raffle, numbers) {
+    async function processReservation(action, numbers) {
         if (isProcessingReservation) {
             showToast('Processando reserva anterior...', 'info');
             return;
@@ -3396,12 +3461,12 @@
         }
         
         isProcessingReservation = true;
-        currentRaffle = raffle;
+        currentAction = action;
         
-        const code = 'RIFA-' + raffle.id.substring(0, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        const code = 'AÇÃO-' + action.id.substring(0, 4).toUpperCase() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
         currentPurchaseCode = code;
         
-        const total = raffle.price * numbers.length;
+        const total = action.price * numbers.length;
         
         let countdownHours = 24;
         if (systemConfig && systemConfig.countdownEnabled && systemConfig.countdownHours) {
@@ -3409,10 +3474,10 @@
         }
         const expiresAt = new Date(Date.now() + countdownHours * 60 * 60 * 1000);
         
-        purchaseTitle.textContent = raffle.title;
+        purchaseTitle.textContent = action.title;
         purchaseNumbers.textContent = numbers.join(', ');
         purchaseQuantity.textContent = numbers.length;
-        purchasePrice.textContent = `R$ ${raffle.price.toFixed(2)}`;
+        purchasePrice.textContent = `R$ ${action.price.toFixed(2)}`;
         purchaseTotal.textContent = `R$ ${total.toFixed(2)}`;
         purchaseCode.textContent = code;
         
@@ -3431,13 +3496,13 @@
             paymentCountdown.style.display = 'none';
         }
         
-        setupWhatsappButton(raffle, numbers, code, total);
+        setupWhatsappButton(action, numbers, code, total);
         
         purchaseModal.style.display = 'flex';
         
         const reservationData = {
             code: code,
-            raffleId: raffle.id,
+            actionId: action.id,
             userId: userToken,
             userName: userName,
             numbers: numbers,
@@ -3462,13 +3527,13 @@
                 };
             });
             
-            return db.collection("raffles").doc(raffle.id).update(updates);
+            return db.collection("actions").doc(action.id).update(updates);
         })
         .then(() => {
             showToast('Reserva realizada! Envie o comprovante.', 'success');
             
             const premiumNumbersInSelection = numbers.filter(n => 
-                raffle.premiumNumbers && raffle.premiumNumbers.includes(n)
+                action.premiumNumbers && action.premiumNumbers.includes(n)
             );
             
             if (premiumNumbersInSelection.length > 0) {
@@ -3484,9 +3549,9 @@
         });
     }
 
-    function setupWhatsappButton(raffle, numbers, code, total) {
+    function setupWhatsappButton(action, numbers, code, total) {
         const message = encodeURIComponent(
-            `Olá! Reserva na rifa "${raffle.title}".\n` +
+            `Olá! Reserva na ação "${action.title}".\n` +
             `Código: ${code}\n` +
             `Cotas: ${numbers.join(', ')}\n` +
             `Total: R$ ${total.toFixed(2)}\n` +
@@ -3500,14 +3565,14 @@
     }
 
     function updateStatusBar() {
-        const active = raffles.filter(r => r.status !== 'completed').length;
-        const completed = raffles.filter(r => r.status === 'completed').length;
+        const active = actions.filter(r => r.status !== 'completed').length;
+        const completed = actions.filter(r => r.status === 'completed').length;
         
         let text = '';
         switch(currentFilter) {
-            case 'all': text = `${raffles.length} rifas (${active} ativas, ${completed} sorteadas)`; break;
-            case 'active': text = `${active} rifas ativas`; break;
-            case 'completed': text = `${completed} rifas sorteadas`; break;
+            case 'all': text = `${actions.length} ações (${active} ativas, ${completed} sorteadas) 🍀`; break;
+            case 'active': text = `${active} ações ativas 🤞`; break;
+            case 'completed': text = `${completed} ações sorteadas 🎉`; break;
         }
         
         statusText.textContent = text;
@@ -3578,46 +3643,48 @@
         });
     }
     
-    function updateAdminRaffleSelect() {
-        raffleIdSelect.innerHTML = '<option value="new">Nova Rifa</option>';
+    function updateAdminActionSelect() {
+        actionIdSelect.innerHTML = '<option value="new">Nova Ação</option>';
         
-        raffles.forEach(raffle => {
+        actions.forEach(action => {
             const option = document.createElement('option');
-            option.value = raffle.id;
-            option.textContent = `#${raffle.id.substring(0, 8)} - ${raffle.title}`;
-            raffleIdSelect.appendChild(option);
+            option.value = action.id;
+            option.textContent = `#${action.id.substring(0, 8)} - ${action.title}`;
+            actionIdSelect.appendChild(option);
         });
     }
     
     function fillAdminForm() {
-        const raffleId = raffleIdSelect.value;
+        const actionId = actionIdSelect.value;
         
-        if (raffleId === 'new') {
+        if (actionId === 'new') {
             resetAdminForm();
             return;
         }
         
-        const raffle = raffles.find(r => r.id === raffleId);
-        if (raffle) {
-            document.getElementById('raffle-title').value = raffle.title || '';
-            document.getElementById('raffle-description').value = raffle.description || '';
-            document.getElementById('raffle-price').value = raffle.price || '';
-            document.getElementById('total-numbers').value = raffle.totalNumbers || '';
-            document.getElementById('raffle-image').value = raffle.image || '';
+        const action = actions.find(r => r.id === actionId);
+        if (action) {
+            document.getElementById('action-title').value = action.title || '';
+            document.getElementById('action-description').value = action.description || '';
+            document.getElementById('action-price').value = action.price || '';
+            document.getElementById('total-numbers').value = action.totalNumbers || '';
+            document.getElementById('action-image').value = action.image || '';
             
             // Preencher novos campos
-            maxPerTokenInput.value = raffle.maxPerToken || 0;
-            raffleSelectionModeSelect.value = raffle.selectionMode || 'both';
+            maxPerTokenInput.value = action.maxPerToken || 0;
+            // Converter 'both' para 'manual' para compatibilidade
+            const selectionMode = action.selectionMode === 'both' ? 'manual' : (action.selectionMode || 'manual');
+            actionSelectionModeSelect.value = selectionMode;
             
-            premiumNumbers = raffle.premiumNumbers || [];
+            premiumNumbers = action.premiumNumbers || [];
             updatePremiumNumbersList();
             
-            const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
-            const isCompleted = raffle.status === 'completed';
+            const soldNumbers = action.purchases ? Object.values(action.purchases).filter(p => p.status === 'confirmed').length : 0;
+            const isCompleted = action.status === 'completed';
             
-            if (soldNumbers === raffle.totalNumbers && !isCompleted) {
+            if (soldNumbers === action.totalNumbers && !isCompleted) {
                 winnerInputSection.style.display = 'block';
-                winnerNumberInput.max = raffle.totalNumbers;
+                winnerNumberInput.max = action.totalNumbers;
                 winnerNumberInput.min = 1;
                 winnerNumberInput.value = '';
             } else {
@@ -3627,14 +3694,14 @@
     }
     
     function resetAdminForm() {
-        raffleIdSelect.value = 'new';
-        document.getElementById('raffle-title').value = '';
-        document.getElementById('raffle-description').value = '';
-        document.getElementById('raffle-price').value = '';
+        actionIdSelect.value = 'new';
+        document.getElementById('action-title').value = '';
+        document.getElementById('action-description').value = '';
+        document.getElementById('action-price').value = '';
         document.getElementById('total-numbers').value = '100';
-        document.getElementById('raffle-image').value = '';
+        document.getElementById('action-image').value = '';
         maxPerTokenInput.value = 0;
-        raffleSelectionModeSelect.value = 'both';
+        actionSelectionModeSelect.value = 'manual';
         premiumNumbers = [];
         updatePremiumNumbersList();
         winnerInputSection.style.display = 'none';
@@ -3680,20 +3747,20 @@
         });
     }
     
-    function saveRaffle() {
+    function saveAction() {
         if (!userIsAdmin) {
             showToast('Acesso não autorizado', 'error');
             return;
         }
         
-        const id = raffleIdSelect.value;
-        const title = document.getElementById('raffle-title').value;
-        const description = document.getElementById('raffle-description').value;
-        const price = parseFloat(document.getElementById('raffle-price').value);
+        const id = actionIdSelect.value;
+        const title = document.getElementById('action-title').value;
+        const description = document.getElementById('action-description').value;
+        const price = parseFloat(document.getElementById('action-price').value);
         const totalNumbers = parseInt(document.getElementById('total-numbers').value);
-        const image = document.getElementById('raffle-image').value;
+        const image = document.getElementById('action-image').value;
         const maxPerToken = parseInt(maxPerTokenInput.value) || 0;
-        const selectionMode = raffleSelectionModeSelect.value;
+        const selectionMode = actionSelectionModeSelect.value;
         
         if (!title || !description || !price || !totalNumbers) {
             showToast('Preencha todos os campos obrigatórios', 'error');
@@ -3712,7 +3779,7 @@
         
         premiumNumbers = premiumNumbers.filter(n => n >= 1 && n <= totalNumbers);
         
-        const raffleData = {
+        const actionData = {
             title,
             description,
             price,
@@ -3728,18 +3795,18 @@
         };
         
         if (id === 'new') {
-            db.collection("raffles").add(raffleData)
+            db.collection("actions").add(actionData)
             .then(() => {
-                showToast('Rifa criada!', 'success');
+                showToast('Ação criada!', 'success');
                 resetAdminForm();
-                loadRaffles();
+                loadActions();
             })
             .catch(error => {
-                console.error("Erro ao criar rifa: ", error);
-                showToast('Erro ao criar rifa', 'error');
+                console.error("Erro ao criar ação: ", error);
+                showToast('Erro ao criar ação', 'error');
             });
         } else {
-            db.collection("raffles").doc(id).update({
+            db.collection("actions").doc(id).update({
                 title,
                 description,
                 price,
@@ -3750,13 +3817,13 @@
                 image
             })
             .then(() => {
-                showToast('Rifa atualizada!', 'success');
+                showToast('Ação atualizada!', 'success');
                 resetAdminForm();
-                loadRaffles();
+                loadActions();
             })
             .catch(error => {
-                console.error("Erro ao atualizar rifa: ", error);
-                showToast('Erro ao atualizar rifa', 'error');
+                console.error("Erro ao atualizar ação: ", error);
+                showToast('Erro ao atualizar ação', 'error');
             });
         }
     }
@@ -3891,20 +3958,20 @@
                     return dateB - dateA;
                 });
                 
-                const rafflePromises = participations.map(participation => 
-                    db.collection("raffles").doc(participation.raffleId).get()
+                const actionPromises = participations.map(participation => 
+                    db.collection("actions").doc(participation.actionId).get()
                 );
                 
-                return Promise.all(rafflePromises)
-                    .then(raffleSnapshots => {
+                return Promise.all(actionPromises)
+                    .then(actionSnapshots => {
                         const participationData = [];
                         
-                        raffleSnapshots.forEach((raffleDoc, index) => {
-                            if (raffleDoc.exists) {
-                                const raffleData = raffleDoc.data();
+                        actionSnapshots.forEach((actionDoc, index) => {
+                            if (actionDoc.exists) {
+                                const actionData = actionDoc.data();
                                 participationData.push({
                                     purchase: participations[index],
-                                    raffle: { id: raffleDoc.id, ...raffleData }
+                                    action: { id: actionDoc.id, ...actionData }
                                 });
                             }
                         });
@@ -3937,14 +4004,14 @@
         
         participationData.forEach(item => {
             const purchase = item.purchase;
-            const raffle = item.raffle;
+            const action = item.action;
             
-            const premiumNumbers = raffle.premiumNumbers || [];
+            const premiumNumbers = action.premiumNumbers || [];
             const premiumNumbersInPurchase = purchase.numbers.filter(n => premiumNumbers.includes(n));
             
-            const isWinner = raffle.winningNumber && purchase.numbers.includes(raffle.winningNumber);
+            const isWinner = action.winningNumber && purchase.numbers.includes(action.winningNumber);
             
-            const premiumWinners = raffle.premiumWinners || {};
+            const premiumWinners = action.premiumWinners || {};
             const userPremiumWins = purchase.numbers.filter(n => 
                 premiumWinners[n] && premiumWinners[n].userId === userToken
             );
@@ -3977,7 +4044,7 @@
             
             participationItem.innerHTML = `
                 <div class="participation-header">
-                    <div class="participation-title">${raffle.title}</div>
+                    <div class="participation-title">${action.title}</div>
                     <div class="participation-status ${statusClass}">${statusText}</div>
                 </div>
                 
@@ -4008,7 +4075,7 @@
                             }
                         }
                         
-                        if (isWinner && number === raffle.winningNumber) {
+                        if (isWinner && number === action.winningNumber) {
                             className += ' participation-winner';
                             extraText = ' 👑 VENCEDOR!';
                         }
@@ -4020,7 +4087,7 @@
                 ${isWinner ? `
                     <div style="margin-top:10px;padding:10px;background:rgba(243,156,18,0.1);border-radius:6px;">
                         <strong>🎉 PARABÉNS! 🎉</strong>
-                        <p>Você é o vencedor desta rifa com a cota ${raffle.winningNumber}!</p>
+                        <p>Você é o vencedor desta ação com a cota ${action.winningNumber}!</p>
                     </div>
                 ` : ''}
                 
@@ -4035,7 +4102,7 @@
                     <div style="margin-top:10px;padding:10px;background:rgba(52,152,219,0.1);border-radius:6px;">
                         <strong>⏰ RESERVA PENDENTE</strong>
                         <p>Envie o comprovante de pagamento para confirmar suas cotas.</p>
-                        <button class="btn-pay-pending" data-purchase-id="${purchase.id}" data-raffle-id="${raffle.id}">
+                        <button class="btn-pay-pending" data-purchase-id="${purchase.id}" data-action-id="${action.id}">
                             <i class="fas fa-credit-card"></i> Pagar Agora
                         </button>
                     </div>
@@ -4048,8 +4115,8 @@
         participationList.querySelectorAll('.btn-pay-pending').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const purchaseId = e.target.closest('button').dataset.purchaseId;
-                const raffleId = e.target.closest('button').dataset.raffleId;
-                openPaymentForPendingReservation(purchaseId, raffleId);
+                const actionId = e.target.closest('button').dataset.actionId;
+                openPaymentForPendingReservation(purchaseId, actionId);
             });
         });
         
@@ -4125,7 +4192,7 @@
                             
                             if (now > expirationDate) {
                                 hasExpired = true;
-                                cancelExpiredReservation(reservation.id, reservation.raffleId, reservation.numbers);
+                                cancelExpiredReservation(reservation.id, reservation.actionId, reservation.numbers);
                             }
                         }
                     }
@@ -4151,17 +4218,17 @@
                                 <strong>${reservation.userName || 'Cliente'}</strong>
                                 <small>${formatDate(reservation.reservedAt ? reservation.reservedAt.toDate() : new Date())}</small>
                             </div>
-                            <div><strong>Rifa ID:</strong> ${reservation.raffleId || 'N/A'}</div>
+                            <div><strong>Ação ID:</strong> ${reservation.actionId || 'N/A'}</div>
                             <div><strong>Código:</strong> ${reservation.code || 'N/A'}</div>
                             <div><strong>Total:</strong> R$ ${reservation.total ? reservation.total.toFixed(2) : '0.00'}</div>
                             <div><strong>Token:</strong> ${reservation.userId || 'N/A'}</div>
                             <div><strong>Tempo restante:</strong> ${timeRemaining} ${isExpired ? '<span class="expired-badge" style="font-size:0.7rem;padding:2px 6px;">EXPIRADO</span>' : ''}</div>
                             <div style="margin:8px 0;"><strong>Cotas:</strong> ${reservation.numbers ? reservation.numbers.join(', ') : 'Nenhuma'}</div>
                             <div class="reservation-actions">
-                                <button class="btn-confirm" data-id="${reservation.id}" data-raffle="${reservation.raffleId}">
+                                <button class="btn-confirm" data-id="${reservation.id}" data-action="${reservation.actionId}">
                                     <i class="fas fa-check"></i> Confirmar
                                 </button>
-                                <button class="btn-cancel" data-id="${reservation.id}" data-raffle="${reservation.raffleId}">
+                                <button class="btn-cancel" data-id="${reservation.id}" data-action="${reservation.actionId}">
                                     <i class="fas fa-times"></i> Cancelar
                                 </button>
                             </div>
@@ -4172,16 +4239,16 @@
                     document.querySelectorAll('.btn-confirm').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const id = e.target.closest('button').dataset.id;
-                            const raffleId = e.target.closest('button').dataset.raffle;
-                            confirmReservation(id, raffleId);
+                            const actionId = e.target.closest('button').dataset.action;
+                            confirmReservation(id, actionId);
                         });
                     });
                     
                     document.querySelectorAll('.btn-cancel').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const id = e.target.closest('button').dataset.id;
-                            const raffleId = e.target.closest('button').dataset.raffle;
-                            cancelReservation(id, raffleId);
+                            const actionId = e.target.closest('button').dataset.action;
+                            cancelReservation(id, actionId);
                         });
                     });
                     
@@ -4193,84 +4260,84 @@
         });
     }
     
-    function loadCompletedRaffles() {
+    function loadCompletedActions() {
         if (!userIsAdmin || !currentAdminUserId) {
             showToast('Acesso não autorizado', 'error');
             return;
         }
         
-        completedRafflesList.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> Carregando rifas sorteadas...</div>';
+        completedActionsList.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> Carregando ações sorteadas...</div>';
         
-        db.collection("raffles")
+        db.collection("actions")
             .where("status", "==", "completed")
             .get()
             .then((snapshot) => {
-                completedRafflesList.innerHTML = '';
+                completedActionsList.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    completedRafflesList.innerHTML = '<p style="text-align:center;padding:20px;color:var(--secondary);">Nenhuma rifa sorteada encontrada.</p>';
+                    completedActionsList.innerHTML = '<p style="text-align:center;padding:20px;color:var(--secondary);">Nenhuma ação sorteada encontrada.</p>';
                     return;
                 }
                 
-                const completedRaffles = [];
+                const completedActions = [];
                 snapshot.forEach(doc => {
-                    completedRaffles.push({ id: doc.id, ...doc.data() });
+                    completedActions.push({ id: doc.id, ...doc.data() });
                 });
                 
-                completedRaffles.sort((a, b) => {
+                completedActions.sort((a, b) => {
                     const dateA = a.drawDate ? a.drawDate.toDate() : new Date(0);
                     const dateB = b.drawDate ? b.drawDate.toDate() : new Date(0);
                     return dateA - dateB;
                 });
                 
-                completedRaffles.forEach(raffle => {
-                    const raffleItem = document.createElement('div');
-                    raffleItem.className = 'completed-raffle-item';
+                completedActions.forEach(action => {
+                    const actionItem = document.createElement('div');
+                    actionItem.className = 'completed-action-item';
                     
-                    const drawDate = raffle.drawDate ? raffle.drawDate.toDate() : null;
+                    const drawDate = action.drawDate ? action.drawDate.toDate() : null;
                     const drawDateStr = drawDate ? formatDate(drawDate) : 'Data desconhecida';
                     
-                    raffleItem.innerHTML = `
-                        <div class="raffle-info-small">
-                            <h4>${raffle.title}</h4>
+                    actionItem.innerHTML = `
+                        <div class="action-info-small">
+                            <h4>${action.title}</h4>
                             <div><strong>Sorteada em:</strong> ${drawDateStr}</div>
-                            <div><strong>Vencedor:</strong> ${raffle.winnerName || 'Não definido'}</div>
-                            <div><strong>Número sorteado:</strong> ${raffle.winningNumber || 'Não definido'}</div>
+                            <div><strong>Vencedor:</strong> ${action.winnerName || 'Não definido'}</div>
+                            <div><strong>Número sorteado:</strong> ${action.winningNumber || 'Não definido'}</div>
                         </div>
-                        <button class="btn-delete-raffle" data-id="${raffle.id}" data-title="${raffle.title}">
+                        <button class="btn-delete-action" data-id="${action.id}" data-title="${action.title}">
                             <i class="fas fa-trash"></i> Excluir
                         </button>
                     `;
                     
-                    completedRafflesList.appendChild(raffleItem);
+                    completedActionsList.appendChild(actionItem);
                 });
                 
-                completedRafflesList.querySelectorAll('.btn-delete-raffle').forEach(btn => {
+                completedActionsList.querySelectorAll('.btn-delete-action').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        const raffleId = e.target.closest('button').dataset.id;
-                        const raffleTitle = e.target.closest('button').dataset.title;
-                        deleteCompletedRaffle(raffleId, raffleTitle);
+                        const actionId = e.target.closest('button').dataset.id;
+                        const actionTitle = e.target.closest('button').dataset.title;
+                        deleteCompletedAction(actionId, actionTitle);
                     });
                 });
             })
             .catch(error => {
-                console.error("Erro ao carregar rifas sorteadas:", error);
-                completedRafflesList.innerHTML = `<p style="color:var(--danger);text-align:center;">Erro ao carregar rifas sorteadas</p>`;
+                console.error("Erro ao carregar ações sorteadas:", error);
+                completedActionsList.innerHTML = `<p style="color:var(--danger);text-align:center;">Erro ao carregar ações sorteadas</p>`;
             });
     }
     
-    function deleteCompletedRaffle(raffleId, raffleTitle) {
+    function deleteCompletedAction(actionId, actionTitle) {
         if (!userIsAdmin || !currentAdminUserId) {
             showToast('Acesso não autorizado', 'error');
             return;
         }
         
-        if (!confirm(`Tem certeza que deseja excluir a rifa "${raffleTitle}"?\n\nEsta ação é IRREVERSÍVEL e removerá permanentemente:\n- A rifa\n- Todas as compras associadas\n- Histórico de vencedores\n\nClique em OK para confirmar.`)) {
+        if (!confirm(`Tem certeza que deseja excluir a ação "${actionTitle}"?\n\nEsta ação é IRREVERSÍVEL e removerá permanentemente:\n- A ação\n- Todas as compras associadas\n- Histórico de vencedores\n\nClique em OK para confirmar.`)) {
             return;
         }
         
         db.collection("purchases")
-            .where("raffleId", "==", raffleId)
+            .where("actionId", "==", actionId)
             .get()
             .then(snapshot => {
                 const batch = db.batch();
@@ -4279,23 +4346,23 @@
                     batch.delete(doc.ref);
                 });
                 
-                const raffleRef = db.collection("raffles").doc(raffleId);
-                batch.delete(raffleRef);
+                const actionRef = db.collection("actions").doc(actionId);
+                batch.delete(actionRef);
                 
                 return batch.commit();
             })
             .then(() => {
-                showToast(`Rifa "${raffleTitle}" excluída com sucesso!`, 'success');
-                loadCompletedRaffles();
-                loadRaffles();
+                showToast(`Ação "${actionTitle}" excluída com sucesso!`, 'success');
+                loadCompletedActions();
+                loadActions();
             })
             .catch(error => {
-                console.error("Erro ao excluir rifa:", error);
-                showToast('Erro ao excluir rifa', 'error');
+                console.error("Erro ao excluir ação:", error);
+                showToast('Erro ao excluir ação', 'error');
             });
     }
     
-    function confirmReservation(purchaseId, raffleId) {
+    function confirmReservation(purchaseId, actionId) {
         if (!userIsAdmin || !currentAdminUserId) {
             showToast('Acesso não autorizado', 'error');
             return;
@@ -4321,15 +4388,15 @@
                     updates[`purchases.${number}.confirmedAt`] = firebase.firestore.FieldValue.serverTimestamp();
                 });
                 
-                return db.collection("raffles").doc(raffleId).update(updates)
+                return db.collection("actions").doc(actionId).update(updates)
                     .then(() => reservation);
             })
             .then(reservation => {
-                return db.collection("raffles").doc(raffleId).get()
-                    .then(raffleDoc => {
-                        const raffleData = raffleDoc.data();
+                return db.collection("actions").doc(actionId).get()
+                    .then(actionDoc => {
+                        const actionData = actionDoc.data();
                         const premiumNumbersInReservation = reservation.numbers.filter(n => 
-                            raffleData.premiumNumbers && raffleData.premiumNumbers.includes(n)
+                            actionData.premiumNumbers && actionData.premiumNumbers.includes(n)
                         );
                         
                         if (premiumNumbersInReservation.length > 0) {
@@ -4344,7 +4411,7 @@
                                 };
                             });
                             
-                            return db.collection("raffles").doc(raffleId).update(winnerUpdates)
+                            return db.collection("actions").doc(actionId).update(winnerUpdates)
                                 .then(() => ({ reservation, premiumNumbersInReservation }));
                         }
                         return { reservation, premiumNumbersInReservation };
@@ -4363,7 +4430,7 @@
                 }
                 
                 loadPendingReservations();
-                loadRaffles();
+                loadActions();
             })
             .catch(error => {
                 console.error("Erro ao confirmar reserva:", error);
@@ -4371,7 +4438,7 @@
             });
     }
     
-    function cancelReservation(purchaseId, raffleId) {
+    function cancelReservation(purchaseId, actionId) {
         if (!userIsAdmin || !currentAdminUserId) {
             showToast('Acesso não autorizado', 'error');
             return;
@@ -4396,12 +4463,12 @@
                     updates[`purchases.${number}`] = firebase.firestore.FieldValue.delete();
                 });
                 
-                return db.collection("raffles").doc(raffleId).update(updates);
+                return db.collection("actions").doc(actionId).update(updates);
             })
             .then(() => {
                 showToast('Reserva cancelada!', 'success');
                 loadPendingReservations();
-                loadRaffles();
+                loadActions();
             })
             .catch(error => {
                 console.error("Erro ao cancelar reserva:", error);
@@ -4410,11 +4477,11 @@
     }
     
     function setWinner() {
-        const raffleId = raffleIdSelect.value;
+        const actionId = actionIdSelect.value;
         const winnerNumber = parseInt(winnerNumberInput.value);
         
-        if (!raffleId || raffleId === 'new') {
-            showToast('Selecione uma rifa válida', 'error');
+        if (!actionId || actionId === 'new') {
+            showToast('Selecione uma ação válida', 'error');
             return;
         }
         
@@ -4423,32 +4490,32 @@
             return;
         }
         
-        const raffle = raffles.find(r => r.id === raffleId);
-        if (!raffle) {
-            showToast('Rifa não encontrada', 'error');
+        const action = actions.find(r => r.id === actionId);
+        if (!action) {
+            showToast('Ação não encontrada', 'error');
             return;
         }
         
-        if (winnerNumber > raffle.totalNumbers) {
-            showToast(`Número deve ser entre 1 e ${raffle.totalNumbers}`, 'error');
+        if (winnerNumber > action.totalNumbers) {
+            showToast(`Número deve ser entre 1 e ${action.totalNumbers}`, 'error');
             return;
         }
         
-        const soldNumbers = raffle.purchases ? Object.values(raffle.purchases).filter(p => p.status === 'confirmed').length : 0;
-        if (soldNumbers < raffle.totalNumbers) {
+        const soldNumbers = action.purchases ? Object.values(action.purchases).filter(p => p.status === 'confirmed').length : 0;
+        if (soldNumbers < action.totalNumbers) {
             showToast('Todas as cotas precisam estar vendidas', 'error');
             return;
         }
         
         let winnerName = 'A ser anunciado';
-        if (raffle.purchases && raffle.purchases[winnerNumber]) {
-            const purchase = raffle.purchases[winnerNumber];
+        if (action.purchases && action.purchases[winnerNumber]) {
+            const purchase = action.purchases[winnerNumber];
             if (purchase.userName) {
                 winnerName = purchase.userName;
             }
         }
         
-        db.collection("raffles").doc(raffleId).update({
+        db.collection("actions").doc(actionId).update({
             winningNumber: winnerNumber,
             winnerName: winnerName,
             status: 'completed',
@@ -4458,7 +4525,7 @@
             showToast('Vencedor definido!', 'success');
             winnerNumberInput.value = '';
             winnerInputSection.style.display = 'none';
-            loadRaffles();
+            loadActions();
             fillAdminForm();
         })
         .catch(error => {
@@ -4467,7 +4534,7 @@
         });
     }
 
-    function openPaymentForPendingReservation(purchaseId, raffleId) {
+    function openPaymentForPendingReservation(purchaseId, actionId) {
         participationModal.style.display = 'none';
         
         db.collection("purchases").doc(purchaseId).get()
@@ -4491,24 +4558,24 @@
                     }
                     
                     if (now > expirationDate) {
-                        cancelExpiredReservation(purchaseId, raffleId, purchase.numbers);
+                        cancelExpiredReservation(purchaseId, actionId, purchase.numbers);
                         showToast('Reserva expirada. Tente novamente.', 'error');
                         return;
                     }
                 }
                 
-                return db.collection("raffles").doc(raffleId).get()
-                    .then(raffleDoc => {
-                        if (!raffleDoc.exists) {
-                            throw new Error("Rifa não encontrada");
+                return db.collection("actions").doc(actionId).get()
+                    .then(actionDoc => {
+                        if (!actionDoc.exists) {
+                            throw new Error("Ação não encontrada");
                         }
                         
-                        const raffle = { id: raffleDoc.id, ...raffleDoc.data() };
+                        const action = { id: actionDoc.id, ...actionDoc.data() };
                         
-                        purchaseTitle.textContent = raffle.title;
+                        purchaseTitle.textContent = action.title;
                         purchaseNumbers.textContent = purchase.numbers.join(', ');
                         purchaseQuantity.textContent = purchase.numbers.length;
-                        purchasePrice.textContent = `R$ ${raffle.price.toFixed(2)}`;
+                        purchasePrice.textContent = `R$ ${action.price.toFixed(2)}`;
                         purchaseTotal.textContent = `R$ ${purchase.total.toFixed(2)}`;
                         purchaseCode.textContent = purchase.code;
                         
@@ -4528,7 +4595,7 @@
                         }
                         
                         const message = encodeURIComponent(
-                            `Olá! Segue comprovante para a reserva na rifa "${raffle.title}".\n` +
+                            `Olá! Segue comprovante para a reserva na ação "${action.title}".\n` +
                             `Código: ${purchase.code}\n` +
                             `Cotas: ${purchase.numbers.join(', ')}\n` +
                             `Total: R$ ${purchase.total.toFixed(2)}`
